@@ -780,61 +780,87 @@
       });
     }
 
-    // Bento Box Summary
     function renderSummaryBento(summaryList) {
-      const container = document.getElementById('summaryCardsContainer');
-      if(!summaryList.length) { container.innerHTML = '<div class="text-center text-muted p-5">ยังไม่มีข้อมูลสรุป</div>'; return; }
-      
-      let html = '';
-      // กราฟ (Charts) ไว้ด้านบนสุด
-      html += `
-        <div class="bento-card mb-3 p-3">
-          <span class="bento-label mb-2 d-block">แนวโน้มรายรับ</span>
-          <div style="height: 180px;"><canvas id="incomeChart"></canvas></div>
-        </div>
-      `;
+  const container = document.getElementById('summaryCardsContainer');
+  if (!summaryList.length) {
+    container.innerHTML = '<div class="text-center text-muted p-5">ยังไม่มีข้อมูลสรุป</div>';
+    return;
+  }
 
-      summaryList.forEach(s => {
-        html += `
-        <h5 class="fw-bold mt-4 mb-3 ps-2" style="font-size:1.1rem;">รอบงวด: ${s.period}</h5>
-        <div class="bento-grid">
-          <!-- Card 1 -->
-          <div class="bento-card full-width" style="background: linear-gradient(135deg, var(--accent-blue), #5856D6); color: white;">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <span class="bento-label text-white opacity-75">รายรับรวม (คอมฯ + เบี้ยเลี้ยง)</span>
-                <div class="bento-value text-white mt-1">฿ ${s.grandTotalJobsCost.toLocaleString()}</div>
-              </div>
-              <div class="bento-icon" style="background:rgba(255,255,255,0.2);"><i class="fa-solid fa-wallet"></i></div>
-            </div>
+  let html = '';
+  // กราฟ (Charts) ไว้ด้านบนสุด
+  html += `
+    <div class="bento-card mb-3 p-3">
+      <span class="bento-label mb-2 d-block">แนวโน้มรายรับ</span>
+      <div style="height: 180px;"><canvas id="incomeChart"></canvas></div>
+    </div>
+  `;
+
+  summaryList.forEach(s => {
+    // ตรวจสอบค่าก่อนแสดงผลเพื่อป้องกัน Error ในกรณีที่ข้อมูลเป็น undefined
+    const totalComm = s.totalComm || 0;
+    const totalAllowance = s.totalAllowance || 0;
+    const grandTotal = s.grandTotalJobsCost || 0;
+
+    html += `
+    <h5 class="fw-bold mt-4 mb-3 ps-2" style="font-size:1.1rem;">รอบงวด: ${s.period}</h5>
+    <div class="bento-grid">
+      
+      <!-- 1. รายได้รวมทั้งหมด -->
+      <div class="bento-card full-width" style="background: linear-gradient(135deg, var(--accent-blue), #5856D6); color: white;">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="bento-label text-white opacity-75">รายได้รวมทั้งหมด</span>
+            <div class="bento-value text-white mt-1">฿ ${grandTotal.toLocaleString()}</div>
           </div>
-          <!-- Card 2 -->
-          <div class="bento-card">
-            <div class="bento-icon" style="background:rgba(52,199,89,0.1); color:var(--accent-green);"><i class="fa-solid fa-road"></i></div>
-            <div class="bento-value">${s.totalDist.toLocaleString()}</div>
-            <span class="bento-label">ระยะทาง (กม.)</span>
+          <div class="bento-icon" style="background:rgba(255,255,255,0.2);"><i class="fa-solid fa-wallet"></i></div>
+        </div>
+      </div>
+
+      <!-- 2. ค่าคอมมิชชั่น (แยกออกมา) -->
+      <div class="bento-card">
+        <div class="bento-icon" style="background:rgba(0,122,255,0.1); color:var(--accent-blue);"><i class="fa-solid fa-sack-dollar"></i></div>
+        <div class="bento-value">${totalComm.toLocaleString()} ฿</div>
+        <span class="bento-label">ค่าคอมมิชชั่น</span>
+      </div>
+
+      <!-- 3. เบี้ยเลี้ยง (แยกออกมา) -->
+      <div class="bento-card">
+        <div class="bento-icon" style="background:rgba(255,149,0,0.1); color:var(--accent-orange);"><i class="fa-solid fa-utensils"></i></div>
+        <div class="bento-value">${totalAllowance.toLocaleString()} ฿</div>
+        <span class="bento-label">เบี้ยเลี้ยง</span>
+      </div>
+
+      <!-- 4. ระยะทาง -->
+      <div class="bento-card">
+        <div class="bento-icon" style="background:rgba(52,199,89,0.1); color:var(--accent-green);"><i class="fa-solid fa-road"></i></div>
+        <div class="bento-value">${s.totalDist.toLocaleString()}</div>
+        <span class="bento-label">ระยะทาง (กม.)</span>
+      </div>
+
+      <!-- 5. ค่าน้ำมัน -->
+      <div class="bento-card">
+        <div class="bento-icon" style="background:rgba(255,59,48,0.1); color:var(--accent-red);"><i class="fa-solid fa-gas-pump"></i></div>
+        <div class="bento-value">฿ ${s.totalFuelCost.toLocaleString()}</div>
+        <span class="bento-label">ค่าน้ำมันรวม</span>
+      </div>
+
+      <!-- 6. อัตราสิ้นเปลือง -->
+      <div class="bento-card full-width">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="bento-label">อัตราสิ้นเปลือง</span>
+            <div class="bento-value mt-1" style="color:var(--accent-purple);">${s.fuelEfficiency} <span style="font-size:0.9rem;">กม./ลิตร</span></div>
           </div>
-          <!-- Card 3 -->
-          <div class="bento-card">
-            <div class="bento-icon" style="background:rgba(255,59,48,0.1); color:var(--accent-red);"><i class="fa-solid fa-gas-pump"></i></div>
-            <div class="bento-value">฿ ${s.totalFuelCost.toLocaleString()}</div>
-            <span class="bento-label">ค่าน้ำมันรวม</span>
-          </div>
-          <!-- Card 4 -->
-          <div class="bento-card full-width">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <span class="bento-label">อัตราสิ้นเปลือง</span>
-                <div class="bento-value mt-1" style="color:var(--accent-purple);">${s.fuelEfficiency} <span style="font-size:0.9rem;">กม./ลิตร</span></div>
-              </div>
-              <div class="bento-icon" style="background:rgba(175,82,222,0.1); color:var(--accent-purple);"><i class="fa-solid fa-gauge-high"></i></div>
-            </div>
-          </div>
-        </div>`;
-      });
-      container.innerHTML = html;
-      renderCharts(summaryList);
-    }
+          <div class="bento-icon" style="background:rgba(175,82,222,0.1); color:var(--accent-purple);"><i class="fa-solid fa-gauge-high"></i></div>
+        </div>
+      </div>
+      
+    </div>`;
+  });
+  container.innerHTML = html;
+  renderCharts(summaryList);
+}
 
     function renderCharts(summaryList) {
       const labels = summaryList.map(s => s.period.split(' ')[1] || s.period);
