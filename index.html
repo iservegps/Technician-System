@@ -2,15 +2,17 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Technician Intelligent Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Tech Dashboard</title>
   
+  <!-- PWA & Apple Meta Tags -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#4f46e5">
+  <meta name="theme-color" content="#f2f2f7">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="apple-touch-icon" href="icon.png">
 
+  <!-- Fonts & Icons & Framework -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,370 +20,386 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
+    /* iOS / Modern App Design System */
     :root {
-      --primary-color: #4f46e5;
-      --secondary-color: #0d9488;
-      --bg-color: #f8fafc;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
+      --app-bg: #f2f2f7;
       --card-bg: #ffffff;
+      --text-main: #1c1c1e;
+      --text-muted: #8e8e93;
+      --accent-blue: #007aff;
+      --accent-green: #34c759;
+      --accent-orange: #ff9500;
+      --accent-red: #ff3b30;
+      --accent-purple: #af52de;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --shadow-soft: 0 4px 24px rgba(0,0,0,0.04);
+      --shadow-float: 0 10px 30px rgba(0,0,0,0.08);
     }
 
     body { 
       font-family: 'Prompt', sans-serif;
-      background-color: var(--bg-color); 
+      background-color: var(--app-bg); 
       color: var(--text-main); 
       font-size: 15px; 
       -webkit-font-smoothing: antialiased;
-      padding-bottom: 70px;
+      padding-bottom: 100px;
+      padding-top: env(safe-area-inset-top);
     }
-    
-    .glass-nav { 
-      background-color: rgba(15, 23, 42, 0.95) !important; 
-      backdrop-filter: blur(10px);
-      padding: 12px 0;
-      z-index: 1030;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    }
-    .navbar-brand { font-size: 1.2rem; font-weight: 600; letter-spacing: 0.5px; }
 
-    .tab-wrapper { 
-      background: var(--bg-color); 
-      position: sticky; top: 55px; z-index: 1020;
-      padding: 20px 0 10px 0; 
+    /* Top App Bar */
+    .app-header {
+      background: var(--card-bg);
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1020;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
     }
-    .nav-segmented { 
-      background: #e2e8f0;
-      padding: 6px; 
-      border-radius: 16px; 
-      display: flex; 
-      width: 100%; 
-      max-width: 500px; 
-      margin: 0 auto;
+    .app-title { font-size: 1.25rem; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+    .btn-icon-circular {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--app-bg);
+      color: var(--accent-blue);
+      display: flex; justify-content: center; align-items: center;
+      border: none; transition: 0.2s;
     }
-    .nav-segmented .nav-link { 
-      color: var(--text-muted); 
-      font-weight: 500; 
-      border-radius: 12px; 
-      border: none; 
-      padding: 10px; 
-      flex: 1; 
+    .btn-icon-circular:active { transform: scale(0.9); }
+
+    /* Custom Navigation (Desktop & Mobile) */
+    .nav-pills-custom {
+      background: #e3e3e8;
+      border-radius: 20px;
+      padding: 4px;
+      display: inline-flex;
+      margin: 20px 0;
+      width: 100%;
+      max-width: 400px;
+    }
+    .nav-pills-custom .nav-link {
+      border-radius: 16px;
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 10px 16px;
       text-align: center;
+      flex: 1;
+      border: none;
+      background: transparent;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .nav-segmented .nav-link.active { 
-      background: var(--card-bg); 
-      color: var(--primary-color);
-      font-weight: 600;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-    }
-
-    .dashboard-card { 
+    .nav-pills-custom .nav-link.active {
       background: var(--card-bg);
-      border: none; 
-      border-radius: 24px; 
-      padding: 24px; 
-      margin-bottom: 24px; 
-      box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+      color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
-    h4, h5 { font-weight: 600; color: #1e293b; }
-    
-    .metric-card { 
-      border-radius: 20px; 
-      padding: 24px; 
-      color: white; 
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease;
-    }
-    .metric-card:hover { transform: translateY(-5px); }
-    .metric-card .icon-bg {
-      position: absolute; right: -15px; bottom: -15px;
-      font-size: 6rem; opacity: 0.15;
-    }
-    .card-value { font-size: 2rem; font-weight: 700; line-height: 1.2; margin-top: 5px; display: block; }
-    
-    .bg-indigo-premium { background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); } 
-    .bg-teal-premium { background: linear-gradient(135deg, #14b8a6 0%, #0f766e 100%); }
-    .bg-rose-premium { background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%); }
 
-    .table-responsive { border-radius: 16px; border: 1px solid #e2e8f0; background: #fff; }
-    .table th { 
-      background-color: #f8fafc !important; 
-      color: var(--text-muted); 
-      font-weight: 600;
-      font-size: 0.9rem; 
+    /* List Item Cards (แทนที่ตาราง) */
+    .data-list { display: flex; flex-direction: column; gap: 12px; }
+    .list-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
       padding: 16px;
-      border-bottom: 2px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.2s;
+      border: 1px solid rgba(0,0,0,0.02);
     }
-    .table td { 
-      padding: 16px; font-size: 0.95rem; 
-      vertical-align: middle;
-      border-bottom: 1px solid #f1f5f9; 
+    .list-card:active { transform: scale(0.98); }
+    .list-icon {
+      width: 50px; height: 50px;
+      border-radius: var(--radius-md);
+      display: flex; justify-content: center; align-items: center;
+      font-size: 1.2rem; margin-right: 16px; flex-shrink: 0;
     }
-    .table tbody tr:hover { background-color: #f8fafc; }
+    .list-icon.blue { background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); }
+    .list-icon.green { background: rgba(52, 199, 89, 0.1); color: var(--accent-green); }
+    .list-icon.orange { background: rgba(255, 149, 0, 0.1); color: var(--accent-orange); }
+    
+    .list-content { flex-grow: 1; min-width: 0; }
+    .list-title { font-weight: 600; font-size: 1.05rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .list-subtitle { font-size: 0.85rem; color: var(--text-muted); margin: 2px 0 0 0; }
+    
+    .list-trailing { text-align: right; flex-shrink: 0; margin-left: 10px; }
+    .list-amount { font-weight: 700; font-size: 1rem; display: block; }
+    .list-amount.positive { color: var(--accent-green); }
+    .list-amount.neutral { color: var(--text-main); }
+    .list-date { font-size: 0.75rem; color: var(--text-muted); }
 
-    .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 1040; }
-    .fab-btn {
-      width: 60px; height: 60px; border-radius: 50%;
-      background: var(--primary-color); color: white; font-size: 24px;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4); border: none; transition: transform 0.2s;
-    }
-    .fab-btn:active { transform: scale(0.9); }
-
-    .form-control, .form-select { 
-      font-size: 0.95rem; padding: 12px 16px; 
-      border: 1.5px solid #e2e8f0; border-radius: 12px; background-color: #f8fafc;
-    }
-    .form-control:focus, .form-select:focus { 
-      border-color: var(--primary-color); background-color: #fff;
-      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); 
-    }
-
-    @media (max-width: 768px) {
-      .desktop-tabs { display: none; }
-      .dashboard-card { padding: 16px; border-radius: 20px; }
-      
-      .bottom-nav {
-        position: fixed; bottom: 0; left: 0; width: 100%;
-        background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-        display: flex; justify-content: space-around;
-        padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 1030; border-top: 1px solid #e2e8f0;
-      }
-      .bottom-nav .nav-link {
-        display: flex; flex-direction: column; align-items: center;
-        color: var(--text-muted); font-size: 0.75rem; padding: 5px 15px; border-radius: 12px; font-weight: 500;
-      }
-      .bottom-nav .nav-link i { font-size: 1.25rem; margin-bottom: 4px; }
-      .bottom-nav .nav-link.active { color: var(--primary-color); }
-      
-      .fab-container { bottom: calc(80px + env(safe-area-inset-bottom)); }
-
-      .table-responsive { border: none; background: transparent; }
-      .table thead { display: none; }
-      .table tbody tr { 
-        display: block; margin-bottom: 16px; background: #fff; 
-        border-radius: 16px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f1f5f9;
-      }
-      .table tbody td { 
-        display: flex; justify-content: space-between; align-items: center; 
-        padding: 8px 0; border: none; font-size: 0.95rem; text-align: right; 
-      }
-      .table tbody td::before { content: attr(data-label); font-weight: 500; color: var(--text-muted); text-align: left; }
-      .table tbody td:last-child { margin-top: 10px; padding-top: 15px; border-top: 1px dashed #e2e8f0; justify-content: stretch; gap: 10px; }
-      .table tbody td .btn { flex: 1; padding: 10px; border-radius: 10px; }
-
-      .modal-dialog { margin: 0; max-width: 100%; height: 100%; display: flex; align-items: flex-end; }
-      .modal-content { border-radius: 24px 24px 0 0 !important; max-height: 90vh; border: none; }
-      .modal-header { padding: 20px; border-bottom: 1px solid #f1f5f9; }
-      .modal-footer { padding: 16px; border-top: 1px solid #f1f5f9; padding-bottom: max(16px, env(safe-area-inset-bottom));}
+    .action-badge {
+      display: inline-block; padding: 4px 8px; border-radius: 8px;
+      font-size: 0.75rem; font-weight: 600; margin-top: 4px;
     }
 
-    @media (min-width: 769px) { .bottom-nav { display: none; } .mobile-fab { display: none; } }
+    /* Floating Bottom Dock (Mobile Navigation) */
+    .floating-dock {
+      position: fixed;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 30px;
+      padding: 8px 16px;
+      display: flex;
+      gap: 10px;
+      box-shadow: var(--shadow-float);
+      border: 1px solid rgba(255,255,255,0.4);
+      z-index: 1030;
+      width: max-content;
+    }
+    .dock-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      width: 60px; height: 60px; border-radius: 20px;
+      color: var(--text-muted); text-decoration: none; border: none; background: transparent;
+      transition: 0.3s;
+    }
+    .dock-item i { font-size: 1.2rem; margin-bottom: 4px; }
+    .dock-item span { font-size: 0.65rem; font-weight: 600; }
+    .dock-item.active { background: var(--text-main); color: white; }
+
+    /* Bento Box (Summary Page) */
+    .bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .bento-card {
+      background: var(--card-bg); border-radius: var(--radius-lg); padding: 20px;
+      box-shadow: var(--shadow-soft); display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .bento-card.full-width { grid-column: span 2; }
+    .bento-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; margin-bottom: 12px; }
+    .bento-value { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 4px; }
+    .bento-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+
+    /* Modals & Forms */
+    .modal-content { border-radius: 32px; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+    .modal-header { border-bottom: none; padding: 24px 24px 10px 24px; }
+    .modal-body { padding: 0 24px 24px 24px; }
+    .modal-footer { border-top: none; padding: 16px 24px 24px 24px; }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; margin-left: 4px;}
+    .form-control, .form-select {
+      background: var(--app-bg); border: none; border-radius: var(--radius-md);
+      padding: 14px 16px; font-size: 1rem; color: var(--text-main); font-weight: 500;
+      transition: all 0.2s;
+    }
+    .form-control:focus, .form-select:focus {
+      background: #e3e3e8; box-shadow: none; outline: none;
+    }
+    .btn-primary-app {
+      background: var(--accent-blue); color: white; font-weight: 600;
+      border-radius: var(--radius-lg); padding: 16px; width: 100%; border: none;
+      font-size: 1.05rem; display: flex; justify-content: center; align-items: center; gap: 8px;
+    }
+    .btn-success-app { background: var(--accent-green); }
+
+    /* Swipe Action (Simulated Buttons in card) */
+    .card-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(0,0,0,0.05); }
+    .btn-action { 
+      flex: 1; padding: 8px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; border: none; 
+      display: flex; justify-content: center; align-items: center; gap: 6px;
+    }
+    .btn-edit { background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); }
+    .btn-delete { background: rgba(255, 59, 48, 0.1); color: var(--accent-red); }
+
+    /* Add Button (Floating above dock on mobile, or inline on desktop) */
+    .top-action-btn { display: none; }
+
+    @media (min-width: 768px) {
+      body { padding-bottom: 40px; }
+      .floating-dock { display: none; }
+      .top-action-btn { display: inline-flex; }
+      .app-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+      .app-header { border-radius: var(--radius-lg); margin-bottom: 20px; }
+      .modal-dialog { max-width: 500px; }
+    }
+    @media (max-width: 767px) {
+      .app-container { padding: 10px 16px; }
+      .desktop-nav-wrap { display: flex; justify-content: center; }
+      /* Bottom Sheet Modal for Mobile */
+      .modal-dialog { margin: auto 0 0 0; align-items: flex-end; min-height: 100%; display: flex; }
+      .modal-content { border-radius: 32px 32px 0 0; padding-bottom: env(safe-area-inset-bottom); }
+    }
   </style>
 </head>
 <body>
 
-  <div id="loading" style="position: fixed; inset:0; background: rgba(255,255,255,0.8); backdrop-filter: blur(8px); display:flex; flex-direction: column; justify-content:center; align-items:center; z-index:9999;">
-    <div class="spinner-border" style="width: 3rem; height: 3rem; color: var(--primary-color);" role="status"></div>
-    <h6 class="mt-3 fw-bold text-dark">กำลังซิงค์ข้อมูล...</h6>
+  <!-- Loading Screen -->
+  <div id="loading" style="position: fixed; inset:0; background: var(--app-bg); z-index:9999; display:flex; flex-direction: column; justify-content:center; align-items:center;">
+    <div class="spinner-border" style="width: 3rem; height: 3rem; color: var(--text-main);" role="status"></div>
+    <h6 class="mt-4 fw-bold" style="color: var(--text-main);">กำลังโหลดข้อมูล...</h6>
   </div>
 
-  <nav class="navbar navbar-dark glass-nav sticky-top">
-    <div class="container d-flex justify-content-between align-items-center">
-      <span class="navbar-brand m-0"><i class="fa-solid fa-bolt text-warning me-2"></i>Tech System</span>
-      <button class="btn btn-sm btn-light text-dark rounded-pill px-3 shadow-sm" onclick="initSystemSheets()">
-        <i class="fa-solid fa-folder-plus me-1"></i> เปิดงวดใหม่
+  <!-- Header -->
+  <header class="app-header shadow-sm">
+    <h1 class="app-title"><i class="fa-solid fa-bolt text-warning me-2"></i>TechSync</h1>
+    <div>
+      <button class="btn-icon-circular shadow-sm me-2 top-action-btn" id="headerAddBtn" onclick="executeAddAction()">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+      <button class="btn-icon-circular shadow-sm" onclick="initSystemSheets()">
+        <i class="fa-solid fa-folder-plus"></i>
       </button>
     </div>
+  </header>
+
+  <div class="app-container">
+    
+    <!-- Segmented Control (Desktop Only, hidden on mobile logic handled via CSS/JS mix) -->
+    <div class="desktop-nav-wrap d-none d-md-flex">
+      <div class="nav nav-pills-custom" role="tablist">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#job-pane" type="button" onclick="updateView('job')">งานช่าง</button>
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vehicle-pane" type="button" onclick="updateView('vehicle')">ใช้รถ</button>
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#summary-pane" type="button" onclick="triggerChartResize(); updateView('summary')">สรุปผล</button>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="tab-content mt-2">
+      
+      <!-- 📌 แท็บ: งานช่าง -->
+      <div class="tab-pane fade show active" id="job-pane">
+        <div class="d-flex justify-content-between align-items-center mb-3 d-md-none">
+          <h5 class="fw-bold m-0">รายการงาน</h5>
+          <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold shadow-sm" style="background:var(--accent-blue); border:none;" onclick="openJobModal()">
+            <i class="fa-solid fa-plus me-1"></i> เพิ่ม
+          </button>
+        </div>
+        <div class="data-list" id="jobListContainer">
+          <!-- Render Cards Here -->
+        </div>
+      </div>
+
+      <!-- 📌 แท็บ: ใช้รถ -->
+      <div class="tab-pane fade" id="vehicle-pane">
+        <div class="d-flex justify-content-between align-items-center mb-3 d-md-none">
+          <h5 class="fw-bold m-0">ประวัติการใช้รถ</h5>
+          <button class="btn btn-sm btn-success rounded-pill px-3 fw-bold shadow-sm" style="background:var(--accent-green); border:none;" onclick="openVehicleModal()">
+            <i class="fa-solid fa-plus me-1"></i> เพิ่ม
+          </button>
+        </div>
+        <div class="data-list" id="vehicleListContainer">
+          <!-- Render Cards Here -->
+        </div>
+      </div>
+
+      <!-- 📌 แท็บ: สรุปผล (Bento Box) -->
+      <div class="tab-pane fade" id="summary-pane">
+        <div id="summaryCardsContainer">
+          <!-- Render Bento Boxes Here -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 📱 Floating Dock (Mobile Only) -->
+  <nav class="floating-dock nav" role="tablist">
+    <button class="dock-item active" data-bs-toggle="tab" data-bs-target="#job-pane" type="button" onclick="updateView('job')">
+      <i class="fa-solid fa-briefcase"></i><span>งานช่าง</span>
+    </button>
+    <button class="dock-item" data-bs-toggle="tab" data-bs-target="#vehicle-pane" type="button" onclick="updateView('vehicle')">
+      <i class="fa-solid fa-car"></i><span>ใช้รถ</span>
+    </button>
+    <button class="dock-item" data-bs-toggle="tab" data-bs-target="#summary-pane" type="button" onclick="triggerChartResize(); updateView('summary')">
+      <i class="fa-solid fa-chart-pie"></i><span>สรุป</span>
+    </button>
   </nav>
 
-  <div class="tab-wrapper desktop-tabs">
-    <ul class="nav nav-tabs nav-segmented" id="dashboardTabs" role="tablist">
-      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#job-pane" type="button" onclick="updateFabAction('job')"><i class="fa-solid fa-briefcase me-1"></i>งานช่าง</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#vehicle-pane" type="button" onclick="updateFabAction('vehicle')"><i class="fa-solid fa-truck-pickup me-1"></i>ใช้รถ</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#summary-pane" type="button" onclick="triggerChartResize(); updateFabAction('summary')"><i class="fa-solid fa-chart-pie me-1"></i>สรุป</button></li>
-    </ul>
-  </div>
+  <!-- ================= MODALS ================= -->
 
-  <div class="container mt-3 mt-md-0" style="max-width: 1200px;">
-    <div class="tab-content">
-      
-      <div class="tab-pane fade show active" id="job-pane">
-        <div class="dashboard-card">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-              <h5 class="m-0 text-primary"><i class="fa-solid fa-list-check me-2"></i>ประวัติงานช่าง</h5>
-              <small class="text-muted">บันทึกรายการงานและค่าคอมมิชชั่น</small>
-            </div>
-            <button class="btn btn-primary rounded-pill px-4 desktop-tabs shadow-sm" onclick="openJobModal()">
-              <i class="fa-solid fa-plus me-1"></i> เพิ่มงาน
-            </button>
-          </div>
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>วันที่</th><th>ประเภท</th><th>ลูกค้า / ทะเบียน</th><th>สถานที่</th><th>รายได้ (฿)</th><th>งวด</th><th class="text-center">จัดการ</th>
-                </tr>
-              </thead>
-              <tbody id="jobTableBody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div class="tab-pane fade" id="vehicle-pane">
-        <div class="dashboard-card">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-              <h5 class="m-0" style="color: var(--secondary-color);"><i class="fa-solid fa-gas-pump me-2"></i>ประวัติการใช้รถ</h5>
-              <small class="text-muted">บันทึกระยะทางและค่าน้ำมันอัตโนมัติ</small>
-            </div>
-            <button class="btn btn-success rounded-pill px-4 desktop-tabs shadow-sm" style="background-color: var(--secondary-color); border:none;" onclick="openVehicleModal()">
-              <i class="fa-solid fa-plus me-1"></i> เพิ่มบิลรถ
-            </button>
-          </div>
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>วันที่</th><th>เส้นทาง</th><th>งาน / ลูกค้า</th><th>ระยะ (กม.)</th><th>ค่าน้ำมัน (฿)</th><th>งวด</th><th class="text-center">จัดการ</th>
-                </tr>
-              </thead>
-              <tbody id="vehicleTableBody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div class="tab-pane fade" id="summary-pane">
-        <div class="row g-4 mb-4">
-          <div class="col-lg-7">
-            <div class="dashboard-card h-100">
-              <h6 class="mb-3 fw-bold"><i class="fa-solid fa-chart-column text-primary me-2"></i>รายได้รวมแต่ละงวด</h6>
-              <div style="height: 280px;"><canvas id="incomeChart"></canvas></div>
-            </div>
-          </div>
-          <div class="col-lg-5">
-            <div class="dashboard-card h-100">
-              <h6 class="mb-3 fw-bold"><i class="fa-solid fa-chart-line text-success me-2"></i>ประหยัดน้ำมัน (กม./ลิตร)</h6>
-              <div style="height: 280px;"><canvas id="fuelChart"></canvas></div>
-            </div>
-          </div>
-        </div>
-        <div id="summaryCardsContainer"></div>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="bottom-nav nav" role="tablist">
-    <button class="nav-link active bg-transparent border-0" data-bs-toggle="tab" data-bs-target="#job-pane" type="button" onclick="updateFabAction('job')">
-      <i class="fa-solid fa-briefcase"></i> งานช่าง
-    </button>
-    <button class="nav-link bg-transparent border-0" data-bs-toggle="tab" data-bs-target="#vehicle-pane" type="button" onclick="updateFabAction('vehicle')">
-      <i class="fa-solid fa-truck-pickup"></i> ใช้รถ
-    </button>
-    <button class="nav-link bg-transparent border-0" data-bs-toggle="tab" data-bs-target="#summary-pane" type="button" onclick="triggerChartResize(); updateFabAction('summary')">
-      <i class="fa-solid fa-chart-pie"></i> สรุป
-    </button>
-  </div>
-
-  <div class="fab-container mobile-fab" id="mainFabContainer">
-    <button class="fab-btn" onclick="executeFabAction()">
-      <i class="fa-solid fa-plus"></i>
-    </button>
-  </div>
-
+  <!-- Modal Job -->
   <div class="modal fade" id="jobModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header border-0">
-          <h5 class="modal-title fw-bold" id="jobModalTitle"><i class="fa-solid fa-clipboard-check text-primary me-2"></i>บันทึกงานช่าง</h5>
+        <div class="modal-header">
+          <h4 class="modal-title fw-bold" id="jobModalTitle">บันทึกงานใหม่</h4>
           <button type="button" class="btn-close bg-light rounded-circle p-2" data-bs-dismiss="modal"></button>
         </div>
-        <form id="jobForm" onsubmit="submitJobForm(event)" class="d-flex flex-column h-100">
-          <div class="modal-body">
+        <div class="modal-body">
+          <form id="jobForm" onsubmit="submitJobForm(event)">
             <input type="hidden" id="jobId"><input type="hidden" id="jobRegion">
             <div class="row g-3">
-              <div class="col-6"><label class="form-label text-muted small mb-1">วันที่ทำงาน</label><input type="date" id="jobDate" class="form-control" required></div>
-              <div class="col-6"><label class="form-label text-muted small mb-1">ประเภทงาน</label>
-                <select id="jobType" class="form-select" required>
-                  <option value="ติดตั้ง">ติดตั้ง</option><option value="Service">Service</option><option value="ถอดเครื่อง">ถอดเครื่อง</option><option value="เปลี่ยนซิม">เปลี่ยนซิม</option>
-                </select>
+              <div class="col-6">
+                <div class="form-group mb-0"><label class="form-label">วันที่</label><input type="date" id="jobDate" class="form-control" required></div>
               </div>
-              <div class="col-12"><label class="form-label text-muted small mb-1">User ลูกค้า</label><input type="text" id="jobCustomer" class="form-control" placeholder="ระบุชื่อ User" required></div>
-              <div class="col-12"><label class="form-label text-muted small mb-1">ทะเบียนรถลูกค้า</label><input type="text" id="jobCarLicense" class="form-control" placeholder="เช่น กข 1234" required></div>
-              <div class="col-12"><label class="form-label text-muted small mb-1">จังหวัดหน้างาน</label>
-                <select id="jobProvince" class="form-select" onchange="syncRegion(this, 'jobRegion')" required>
-                  <option value="">-- เลือกจังหวัด --</option>
-                  <option value="ขอนแก่น" data-region="ภาคอีสาน">ขอนแก่น</option>
-                  <option value="อุดรธานี" data-region="ภาคอีสาน">อุดรธานี</option>
-                  <option value="นครราชสีมา" data-region="ภาคอีสาน">นครราชสีมา</option>
-                  <option value="บุรีรัมย์" data-region="ภาคอีสาน">บุรีรัมย์</option>
-                  <option value="ร้อยเอ็ด" data-region="ภาคอีสาน">ร้อยเอ็ด</option>
-                </select>
+              <div class="col-6">
+                <div class="form-group mb-0"><label class="form-label">ประเภทงาน</label>
+                  <select id="jobType" class="form-select" required>
+                    <option value="ติดตั้ง">ติดตั้ง</option><option value="Service">Service</option><option value="ถอดเครื่อง">ถอดเครื่อง</option><option value="เปลี่ยนซิม">เปลี่ยนซิม</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-group mb-0"><label class="form-label">ชื่อ User ลูกค้า</label><input type="text" id="jobCustomer" class="form-control" placeholder="ระบุชื่อ User" required></div>
+              </div>
+              <div class="col-12">
+                <div class="form-group mb-0"><label class="form-label">ทะเบียนรถลูกค้า</label><input type="text" id="jobCarLicense" class="form-control" placeholder="เช่น กข 1234" required></div>
+              </div>
+              <div class="col-12">
+                <div class="form-group mb-0"><label class="form-label">จังหวัดหน้างาน</label>
+                  <select id="jobProvince" class="form-select" onchange="syncRegion(this, 'jobRegion')" required>
+                    <option value="">-- เลือกจังหวัด --</option>
+                    <option value="ขอนแก่น" data-region="ภาคอีสาน">ขอนแก่น</option>
+                    <option value="อุดรธานี" data-region="ภาคอีสาน">อุดรธานี</option>
+                    <option value="นครราชสีมา" data-region="ภาคอีสาน">นครราชสีมา</option>
+                    <option value="บุรีรัมย์" data-region="ภาคอีสาน">บุรีรัมย์</option>
+                    <option value="ร้อยเอ็ด" data-region="ภาคอีสาน">ร้อยเอ็ด</option>
+                  </select>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm" style="background:var(--primary-color);">บันทึกข้อมูล</button>
-          </div>
-        </form>
+            <button type="submit" class="btn-primary-app mt-4">บันทึกข้อมูล <i class="fa-solid fa-arrow-right"></i></button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- Modal Vehicle -->
   <div class="modal fade" id="vehicleModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header border-0">
-          <h5 class="modal-title fw-bold" id="vehicleModalTitle"><i class="fa-solid fa-truck-fast text-success me-2"></i>บันทึกการใช้รถ</h5>
+        <div class="modal-header">
+          <h4 class="modal-title fw-bold" id="vehicleModalTitle">บันทึกใช้รถ</h4>
           <button type="button" class="btn-close bg-light rounded-circle p-2" data-bs-dismiss="modal"></button>
         </div>
-        <form id="vehicleForm" onsubmit="submitVehicleForm(event)" class="d-flex flex-column h-100">
-          <div class="modal-body">
+        <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
+          <form id="vehicleForm" onsubmit="submitVehicleForm(event)">
             <input type="hidden" id="vId"><input type="hidden" id="vRegion">
             <div class="row g-3">
-              <div class="col-6"><label class="form-label text-muted small mb-1">วันที่</label><input type="date" id="vDate" class="form-control" required></div>
-              <div class="col-6"><label class="form-label text-muted small mb-1">ประเภทงาน</label>
-                <select id="vJobType" class="form-select" required><option value="ติดตั้ง">ติดตั้ง</option><option value="Service">Service</option><option value="ถอดเครื่อง">ถอดเครื่อง</option><option value="เปลี่ยนซิม">เปลี่ยนซิม</option></select>
-              </div>
-              <div class="col-6"><label class="form-label text-muted small mb-1">จุดเริ่มต้น</label><input type="text" id="vStartLoc" class="form-control" value="ออฟฟิศขอนแก่น" required></div>
-              <div class="col-6"><label class="form-label text-muted small mb-1">ปลายทาง</label><input type="text" id="vDestLoc" class="form-control" placeholder="ระบุสถานที่" required></div>
-              <div class="col-6"><label class="form-label text-muted small mb-1">ชื่อลูกค้า</label><input type="text" id="vCustomerName" class="form-control" required></div>
-              <div class="col-6"><label class="form-label text-muted small mb-1">User ลูกค้า</label><input type="text" id="vCustomerUser" class="form-control" required></div>
-              <div class="col-12 col-md-6"><label class="form-label text-muted small mb-1">จังหวัดปลายทาง</label>
-                <select id="vProvince" class="form-select" onchange="syncRegion(this, 'vRegion')" required>
-                  <option value="">-- เลือกจังหวัด --</option>
-                  <option value="ขอนแก่น" data-region="ภาคอีสาน">ขอนแก่น</option>
-                  <option value="อุดรธานี" data-region="ภาคอีสาน">อุดรธานี</option>
-                  <option value="นครราชสีมา" data-region="ภาคอีสาน">นครราชสีมา</option>
-                  <option value="บุรีรัมย์" data-region="ภาคอีสาน">บุรีรัมย์</option>
-                  <option value="ร้อยเอ็ด" data-region="ภาคอีสาน">ร้อยเอ็ด</option>
-                </select>
-              </div>
-              <div class="col-12 col-md-6"><label class="form-label text-muted small mb-1">ใบเสร็จน้ำมัน (ถ้ามี)</label><input type="text" id="vReceiptNo" class="form-control" placeholder="-"></div>
+              <div class="col-6"><div class="form-group mb-0"><label class="form-label">วันที่</label><input type="date" id="vDate" class="form-control" required></div></div>
+              <div class="col-6"><div class="form-group mb-0"><label class="form-label">ประเภทงาน</label><select id="vJobType" class="form-select" required><option value="ติดตั้ง">ติดตั้ง</option><option value="Service">Service</option><option value="ถอดเครื่อง">ถอดเครื่อง</option><option value="เปลี่ยนซิม">เปลี่ยนซิม</option></select></div></div>
+              <div class="col-6"><div class="form-group mb-0"><label class="form-label">จุดเริ่มต้น</label><input type="text" id="vStartLoc" class="form-control" value="ออฟฟิศขอนแก่น" required></div></div>
+              <div class="col-6"><div class="form-group mb-0"><label class="form-label">ปลายทาง</label><input type="text" id="vDestLoc" class="form-control" placeholder="ระบุสถานที่" required></div></div>
+              <div class="col-6"><div class="form-group mb-0"><label class="form-label">ชื่อลูกค้า</label><input type="text" id="vCustomerName" class="form-control" required></div></div>
+              <div class="col-6"><div class="form-group mb-0"><label class="form-label">User ลูกค้า</label><input type="text" id="vCustomerUser" class="form-control" required></div></div>
+              <div class="col-12"><div class="form-group mb-0"><label class="form-label">จังหวัดปลายทาง</label><select id="vProvince" class="form-select" onchange="syncRegion(this, 'vRegion')" required><option value="">-- เลือกจังหวัด --</option><option value="ขอนแก่น" data-region="ภาคอีสาน">ขอนแก่น</option><option value="อุดรธานี" data-region="ภาคอีสาน">อุดรธานี</option><option value="นครราชสีมา" data-region="ภาคอีสาน">นครราชสีมา</option><option value="บุรีรัมย์" data-region="ภาคอีสาน">บุรีรัมย์</option><option value="ร้อยเอ็ด" data-region="ภาคอีสาน">ร้อยเอ็ด</option></select></div></div>
               
-              <div class="col-6 col-md-3"><label class="form-label text-muted small mb-1">ไมล์เริ่ม</label><input type="number" inputmode="numeric" id="vStartMile" class="form-control" oninput="calcVLive()" required></div>
-              <div class="col-6 col-md-3"><label class="form-label text-muted small mb-1">ไมล์สิ้นสุด</label><input type="number" inputmode="numeric" id="vEndMile" class="form-control" oninput="calcVLive()" required></div>
-              <div class="col-6 col-md-3"><label class="form-label text-muted small mb-1">น้ำมัน (ลิตร)</label><input type="number" step="0.01" inputmode="decimal" id="vFuelLiters" class="form-control" oninput="calcVLive()" value="0"></div>
-              <div class="col-6 col-md-3"><label class="form-label text-muted small mb-1">ราคา/ลิตร</label><input type="number" step="0.01" inputmode="decimal" id="vFuelPrice" class="form-control" oninput="calcVLive()" value="0"></div>
-              
-              <div class="col-12 mt-3 p-3 bg-light rounded-4 text-center d-flex justify-content-center gap-4">
-                <div class="fw-bold"><i class="fa-solid fa-road text-primary me-1"></i> <span id="vLiveDist" class="text-primary fs-5">0</span> กม.</div>
-                <div class="fw-bold"><i class="fa-solid fa-gas-pump text-danger me-1"></i> <span id="vLiveCost" class="text-danger fs-5">0.00</span> ฿</div>
+              <div class="col-6"><div class="form-group mb-0"><label class="form-label">ไมล์เริ่ม</label><input type="number" inputmode="numeric" id="vStartMile" class="form-control" oninput="calcVLive()" required></div></div>
+              <div class="col-6"><div class="form-group mb-0"><label class="form-label">ไมล์จบ</label><input type="number" inputmode="numeric" id="vEndMile" class="form-control" oninput="calcVLive()" required></div></div>
+              <div class="col-6"><div class="form-group mb-0"><label class="form-label">น้ำมัน (ลิตร)</label><input type="number" step="0.01" inputmode="decimal" id="vFuelLiters" class="form-control" oninput="calcVLive()" value="0"></div></div>
+              <div class="col-6"><div class="form-group mb-0"><label class="form-label">ราคา/ลิตร</label><input type="number" step="0.01" inputmode="decimal" id="vFuelPrice" class="form-control" oninput="calcVLive()" value="0"></div></div>
+              <div class="col-12"><div class="form-group mb-0"><label class="form-label">บิลน้ำมัน (ถ้ามี)</label><input type="text" id="vReceiptNo" class="form-control" placeholder="-"></div></div>
+
+              <!-- Live Calc Box -->
+              <div class="col-12">
+                <div class="p-3 rounded-4 mt-2" style="background: rgba(52, 199, 89, 0.1); border: 1px solid rgba(52, 199, 89, 0.2);">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div><span class="d-block text-muted" style="font-size:0.75rem;">ระยะทางรวม</span><span class="fw-bold" style="color:var(--accent-green); font-size:1.1rem;" id="vLiveDist">0 กม.</span></div>
+                    <div class="text-end"><span class="d-block text-muted" style="font-size:0.75rem;">ค่าน้ำมันรวม</span><span class="fw-bold" style="color:var(--accent-orange); font-size:1.1rem;" id="vLiveCost">0.00 ฿</span></div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-success w-100 rounded-pill py-2 fw-bold shadow-sm" style="background:var(--secondary-color);">บันทึกข้อมูลรถ</button>
-          </div>
-        </form>
+            <button type="submit" class="btn-primary-app btn-success-app mt-4">บันทึกข้อมูลรถ <i class="fa-solid fa-check"></i></button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -394,7 +412,7 @@
     let cacheData = { jobs: [], vehicles: [], summary: [] };
     let incomeChartInstance = null;
     let fuelChartInstance = null;
-    let currentActiveTab = 'job';
+    let currentView = 'job';
     
     const jModal = new bootstrap.Modal(document.getElementById('jobModal'));
     const vModal = new bootstrap.Modal(document.getElementById('vehicleModal'));
@@ -404,150 +422,147 @@
       registerPWA();
     };
 
-    function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
+    function showLoading(show) { 
+      document.getElementById('loading').style.display = show ? 'flex' : 'none'; 
+    }
 
-    function updateFabAction(tabName) {
-      currentActiveTab = tabName;
-      const fab = document.getElementById('mainFabContainer');
-      if(tabName === 'summary') {
-        fab.style.display = 'none';
+    function updateView(viewName) {
+      currentView = viewName;
+      const addBtn = document.getElementById('headerAddBtn');
+      if(viewName === 'summary') {
+        addBtn.style.display = 'none';
       } else {
-        fab.style.display = 'block';
-        const btn = fab.querySelector('.fab-btn');
-        btn.style.background = tabName === 'job' ? 'var(--primary-color)' : 'var(--secondary-color)';
+        addBtn.style.display = 'inline-flex';
+        addBtn.style.color = viewName === 'job' ? 'var(--accent-blue)' : 'var(--accent-green)';
       }
     }
     
-    function executeFabAction() {
-      if(currentActiveTab === 'job') openJobModal();
-      else if(currentActiveTab === 'vehicle') openVehicleModal();
+    function executeAddAction() {
+      if(currentView === 'job') openJobModal();
+      else if(currentView === 'vehicle') openVehicleModal();
     }
 
     function callAPI(method, payload, successCallback) {
-      const options = {
-        method: "POST",
-        mode: "cors",
-        redirect: "follow",
-        body: JSON.stringify(payload)
-      };
-      
+      const options = { method: "POST", mode: "cors", redirect: "follow", body: JSON.stringify(payload) };
       fetch(API_URL, options)
         .then(response => response.json())
         .then(data => successCallback(data))
         .catch(err => {
-          console.error(err);
-          Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
-          showLoading(false);
+          console.error(err); Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error'); showLoading(false);
         });
     }
 
     function initSystemSheets() {
-      Swal.fire({ title: 'ตั้งค่าแผ่นงาน?', text: 'สร้างแผ่นงานสำหรับงวดปัจจุบัน', icon: 'info', showCancelButton: true, confirmButtonColor: 'var(--primary-color)', confirmButtonText: 'สร้างเลย', cancelButtonText: 'ยกเลิก' }).then(r => {
-        if(r.isConfirmed){ 
-          showLoading(true); 
-          callAPI("POST", { action: "initSheets" }, (res) => {
-             if(res.success) { Swal.fire('สำเร็จ', res.message, 'success'); fetchData(false); }
-          });
-        }
+      Swal.fire({ title: 'เปิดงวดใหม่?', text: 'ระบบจะสร้างแผ่นงานสำหรับงวดบัญชีปัจจุบัน', icon: 'info', showCancelButton: true, confirmButtonColor: 'var(--accent-blue)', confirmButtonText: 'ตกลง', cancelButtonText: 'ยกเลิก', shape: 'pill' }).then(r => {
+        if(r.isConfirmed){ showLoading(true); callAPI("POST", { action: "initSheets" }, (res) => { if(res.success) { fetchData(false); } }); }
       });
     }
 
-    function syncRegion(el, inputId) {
-      document.getElementById(inputId).value = el.options[el.selectedIndex].getAttribute('data-region') || '';
-    }
+    function syncRegion(el, inputId) { document.getElementById(inputId).value = el.options[el.selectedIndex].getAttribute('data-region') || ''; }
 
     function calcVLive() {
       const sm = Number(document.getElementById('vStartMile').value)||0, em = Number(document.getElementById('vEndMile').value)||0;
       const fl = Number(document.getElementById('vFuelLiters').value)||0, fp = Number(document.getElementById('vFuelPrice').value)||0;
-      document.getElementById('vLiveDist').innerText = (em - sm);
-      document.getElementById('vLiveCost').innerText = (fl * fp).toFixed(2);
+      document.getElementById('vLiveDist').innerText = (em - sm) + ' กม.';
+      document.getElementById('vLiveCost').innerText = (fl * fp).toFixed(2) + ' ฿';
     }
 
     function fetchData(silent = false) {
       if (!silent) showLoading(true);
-      fetch(API_URL)
-        .then(res => res.json())
-        .then(data => {
+      fetch(API_URL).then(res => res.json()).then(data => {
           cacheData = data;
-          renderJobTable(data.jobs);
-          renderVehicleTable(data.vehicles);
-          renderSummaryCards(data.summary);
-          renderCharts(data.summary);
+          renderJobList(data.jobs);
+          renderVehicleList(data.vehicles);
+          renderSummaryBento(data.summary);
           if (!silent) showLoading(false);
-        }).catch(err => {
-          console.error(err);
-          if (!silent) showLoading(false);
-        });
+        }).catch(err => { console.error(err); if (!silent) showLoading(false); });
     }
 
-    function renderJobTable(jobs) {
-      let html = jobs.length ? '' : '<tr><td colspan="7" class="text-center text-muted py-5">ยังไม่มีข้อมูล</td></tr>';
+    function renderJobList(jobs) {
+      const container = document.getElementById('jobListContainer');
+      if(!jobs.length) { container.innerHTML = '<div class="text-center text-muted p-5">ไม่มีข้อมูลงานในระบบ</div>'; return; }
+      
+      let html = '';
       jobs.forEach(j => {
-        html += `<tr>
-          <td data-label="วันที่" class="fw-bold">${j["วันที่"]}</td>
-          <td data-label="ประเภท"><span class="badge ${j["ประเภทงาน"]==='เปลี่ยนซิม'?'bg-warning text-dark':'bg-dark'} rounded-pill">${j["ประเภทงาน"]}</span></td>
-          <td data-label="ลูกค้า / รถ"><b>${j["Userลูกค้า"]}</b><br><small class="text-muted">${j["ทะเบียนรถ"]}</small></td>
-          <td data-label="สถานที่">${j["จังหวัด"]} <small class="text-muted">(${j["ภาค"]})</small></td>
-          <td data-label="รายได้"><span class="text-success fw-bold">คอมฯ +${j["ค่าคอมมิชชั่น"]}</span><br><span class="text-primary fw-bold">เบี้ยเลี้ยง +${j["เบี้ยเลี้ยง"]}</span></td>
-          <td data-label="งวด" class="small text-muted">${j["รอบเดือน"]}</td>
-          <td data-label="" class="text-end text-md-center">
-            <button class="btn btn-sm btn-light text-primary me-1" onclick="editJob('${j["ID"]}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-sm btn-light text-danger" onclick="deleteJob('${j["ID"]}')"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        </tr>`;
+        const total = Number(j["ค่าคอมมิชชั่น"]) + Number(j["เบี้ยเลี้ยง"]);
+        let iconClass = 'blue'; let icon = 'fa-wrench';
+        if(j["ประเภทงาน"] === 'เปลี่ยนซิม') { iconClass = 'orange'; icon = 'fa-sim-card'; }
+        
+        html += `
+        <div class="list-card flex-column align-items-stretch">
+          <div class="d-flex w-100">
+            <div class="list-icon ${iconClass}"><i class="fa-solid ${icon}"></i></div>
+            <div class="list-content">
+              <h4 class="list-title">${j["Userลูกค้า"]}</h4>
+              <p class="list-subtitle">${j["จังหวัด"]} • ${j["ประเภทงาน"]}</p>
+              <span class="action-badge bg-light text-dark border">${j["ทะเบียนรถ"]}</span>
+            </div>
+            <div class="list-trailing">
+              <span class="list-amount positive">+${total} ฿</span>
+              <span class="list-date">${j["วันที่"]}</span>
+              <span class="d-block mt-1 text-muted" style="font-size:0.7rem;">งวด ${j["รอบเดือน"].split(' ')[1] || ''}</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-action btn-edit" onclick="editJob('${j["ID"]}')"><i class="fa-solid fa-pen"></i> แก้ไข</button>
+            <button class="btn-action btn-delete" onclick="deleteJob('${j["ID"]}')"><i class="fa-solid fa-trash"></i> ลบ</button>
+          </div>
+        </div>`;
       });
-      document.getElementById('jobTableBody').innerHTML = html;
+      container.innerHTML = html;
     }
 
-    function renderVehicleTable(vehicles) {
-      let html = vehicles.length ? '' : '<tr><td colspan="7" class="text-center text-muted py-5">ยังไม่มีข้อมูล</td></tr>';
+    function renderVehicleList(vehicles) {
+      const container = document.getElementById('vehicleListContainer');
+      if(!vehicles.length) { container.innerHTML = '<div class="text-center text-muted p-5">ไม่มีข้อมูลการใช้รถ</div>'; return; }
+      
+      let html = '';
       vehicles.forEach(v => {
-        html += `<tr>
-          <td data-label="วันที่" class="fw-bold">${v["วันที่"]}</td>
-          <td data-label="เส้นทาง"><small class="text-muted">${v["จุดเริ่มต้น"]} ➔</small><br><b class="text-danger">${v["ปลายทาง"]}</b></td>
-          <td data-label="ลูกค้า"><span class="badge bg-light text-dark border">${v["ประเภทงาน"]}</span><br>${v["ชื่อลูกค้า"]}</td>
-          <td data-label="ระยะทาง"><b class="fs-6">${v["ระยะทาง"]} กม.</b><br><small class="text-muted">${v["เลขไมล์เริ่ม"]}-${v["เลขไมล์สิ้นสุด"]}</small></td>
-          <td data-label="ค่าน้ำมัน"><b class="text-danger fs-6">${v["ค่าน้ำมัน"].toLocaleString()} ฿</b><br><small class="text-muted">${v["ปริมาณน้ำมัน(ลิตร)"]} ลิตร</small></td>
-          <td data-label="งวด" class="small text-muted">${v["รอบเดือน"]}</td>
-          <td data-label="" class="text-end text-md-center">
-            <button class="btn btn-sm btn-light text-primary me-1" onclick="editVehicle('${v["ID"]}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-sm btn-light text-danger" onclick="deleteVehicle('${v["ID"]}')"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        </tr>`;
+        html += `
+        <div class="list-card flex-column align-items-stretch">
+          <div class="d-flex w-100">
+            <div class="list-icon green"><i class="fa-solid fa-car-side"></i></div>
+            <div class="list-content">
+              <h4 class="list-title">${v["ปลายทาง"]}</h4>
+              <p class="list-subtitle">${v["ชื่อลูกค้า"]}</p>
+              <span class="action-badge" style="background:#f2f2f7;">ระยะ ${v["ระยะทาง"]} กม.</span>
+            </div>
+            <div class="list-trailing">
+              <span class="list-amount" style="color:var(--accent-red);">${Number(v["ค่าน้ำมัน"]) > 0 ? '-' : ''}${v["ค่าน้ำมัน"]} ฿</span>
+              <span class="list-date">${v["วันที่"]}</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-action btn-edit" onclick="editVehicle('${v["ID"]}')"><i class="fa-solid fa-pen"></i> แก้ไข</button>
+            <button class="btn-action btn-delete" onclick="deleteVehicle('${v["ID"]}')"><i class="fa-solid fa-trash"></i> ลบ</button>
+          </div>
+        </div>`;
       });
-      document.getElementById('vehicleTableBody').innerHTML = html;
+      container.innerHTML = html;
     }
 
+    // Modal Actions & Submits
     function openJobModal() {
       document.getElementById('jobForm').reset(); document.getElementById('jobId').value = '';
       document.getElementById('jobDate').value = new Date().toISOString().split('T')[0];
-      document.getElementById('jobModalTitle').innerHTML = '<i class="fa-solid fa-clipboard-check text-primary me-2"></i>เพิ่มบันทึกงานใหม่'; jModal.show();
+      document.getElementById('jobModalTitle').innerText = 'บันทึกงานใหม่'; jModal.show();
     }
-
     function editJob(id) {
       const j = cacheData.jobs.find(x => x["ID"] == id); if(!j) return;
       document.getElementById('jobId').value = j["ID"]; document.getElementById('jobDate').value = j["วันที่"];
       document.getElementById('jobType').value = j["ประเภทงาน"]; document.getElementById('jobCustomer').value = j["Userลูกค้า"];
       document.getElementById('jobCarLicense').value = j["ทะเบียนรถ"]; document.getElementById('jobProvince').value = j["จังหวัด"];
-      document.getElementById('jobRegion').value = j["ภาค"]; document.getElementById('jobModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-primary me-2"></i>แก้ไขงาน'; jModal.show();
+      document.getElementById('jobRegion').value = j["ภาค"]; document.getElementById('jobModalTitle').innerText = 'แก้ไขงาน'; jModal.show();
     }
-
     function submitJobForm(e) {
       e.preventDefault();
       const job = { id: document.getElementById('jobId').value, date: document.getElementById('jobDate').value, jobType: document.getElementById('jobType').value, customerUser: document.getElementById('jobCustomer').value, carLicense: document.getElementById('jobCarLicense').value, province: document.getElementById('jobProvince').value, region: document.getElementById('jobRegion').value };
       jModal.hide(); Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-      
-      callAPI("POST", { action: "saveJob", data: job }, () => {
-         Swal.fire({ title: 'สำเร็จ!', icon: 'success', timer: 1500, showConfirmButton: false }); fetchData(true);
-      });
+      callAPI("POST", { action: "saveJob", data: job }, () => { Swal.close(); fetchData(true); });
     }
-
     function deleteJob(id) {
-      Swal.fire({ title: 'ลบข้อมูล?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' }).then(r => {
-        if(r.isConfirmed) { 
-          Swal.fire({ title: 'กำลังลบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() }); 
-          callAPI("POST", { action: "deleteJob", id: id }, () => { fetchData(true); Swal.close(); });
-        }
+      Swal.fire({ title: 'ลบข้อมูล?', icon: 'warning', showCancelButton: true, confirmButtonColor: 'var(--accent-red)', confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' }).then(r => {
+        if(r.isConfirmed) { Swal.fire({ title: 'กำลังลบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() }); callAPI("POST", { action: "deleteJob", id: id }, () => { fetchData(true); Swal.close(); }); }
       });
     }
 
@@ -556,7 +571,6 @@
       document.getElementById('vDate').value = new Date().toISOString().split('T')[0];
       document.getElementById('vStartLoc').value = 'ออฟฟิศขอนแก่น'; calcVLive(); vModal.show();
     }
-
     function editVehicle(id) {
       const v = cacheData.vehicles.find(x => x["ID"] == id); if(!v) return;
       document.getElementById('vId').value = v["ID"]; document.getElementById('vDate').value = v["วันที่"];
@@ -566,110 +580,104 @@
       document.getElementById('vRegion').value = v["ภาค"]; document.getElementById('vStartMile').value = v["เลขไมล์เริ่ม"];
       document.getElementById('vEndMile').value = v["เลขไมล์สิ้นสุด"]; document.getElementById('vFuelLiters').value = v["ปริมาณน้ำมัน(ลิตร)"];
       document.getElementById('vFuelPrice').value = v["ราคาต่อลิตร"]; document.getElementById('vReceiptNo').value = v["เลขใบเสร็จ"];
-      calcVLive(); vModal.show();
+      calcVLive(); document.getElementById('vehicleModalTitle').innerText = 'แก้ไขข้อมูลรถ'; vModal.show();
     }
-
     function submitVehicleForm(e) {
       e.preventDefault();
       const v = { id: document.getElementById('vId').value, date: document.getElementById('vDate').value, startLoc: document.getElementById('vStartLoc').value, destLoc: document.getElementById('vDestLoc').value, jobType: document.getElementById('vJobType').value, customerName: document.getElementById('vCustomerName').value, customerUser: document.getElementById('vCustomerUser').value, province: document.getElementById('vProvince').value, region: document.getElementById('vRegion').value, startMile: document.getElementById('vStartMile').value, endMile: document.getElementById('vEndMile').value, fuelLiters: document.getElementById('vFuelLiters').value, fuelPrice: document.getElementById('vFuelPrice').value, receiptNo: document.getElementById('vReceiptNo').value };
       vModal.hide(); Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-      
-      callAPI("POST", { action: "saveVehicle", data: v }, () => {
-         Swal.fire({ title: 'สำเร็จ!', icon: 'success', timer: 1500, showConfirmButton: false }); fetchData(true);
+      callAPI("POST", { action: "saveVehicle", data: v }, () => { Swal.close(); fetchData(true); });
+    }
+    function deleteVehicle(id) {
+      Swal.fire({ title: 'ลบข้อมูล?', icon: 'warning', showCancelButton: true, confirmButtonColor: 'var(--accent-red)', confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' }).then(r => {
+        if(r.isConfirmed) { Swal.fire({ title: 'กำลังลบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() }); callAPI("POST", { action: "deleteVehicle", id: id }, () => { fetchData(true); Swal.close(); }); }
       });
     }
 
-    function deleteVehicle(id) {
-      Swal.fire({ title: 'ลบข้อมูล?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'ลบ', cancelButtonText: 'ยกเลิก' }).then(r => {
-        if(r.isConfirmed) { 
-          Swal.fire({ title: 'กำลังลบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() }); 
-          callAPI("POST", { action: "deleteVehicle", id: id }, () => { fetchData(true); Swal.close(); });
+    // Bento Box Summary
+    function renderSummaryBento(summaryList) {
+      const container = document.getElementById('summaryCardsContainer');
+      if(!summaryList.length) { container.innerHTML = '<div class="text-center text-muted p-5">ยังไม่มีข้อมูลสรุป</div>'; return; }
+      
+      let html = '';
+      // กราฟ (Charts) ไว้ด้านบนสุด
+      html += `
+        <div class="bento-card mb-3 p-3">
+          <span class="bento-label mb-2 d-block">แนวโน้มรายรับ</span>
+          <div style="height: 180px;"><canvas id="incomeChart"></canvas></div>
+        </div>
+      `;
+
+      summaryList.forEach(s => {
+        html += `
+        <h5 class="fw-bold mt-4 mb-3 ps-2" style="font-size:1.1rem;">รอบงวด: ${s.period}</h5>
+        <div class="bento-grid">
+          <!-- Card 1 -->
+          <div class="bento-card full-width" style="background: linear-gradient(135deg, var(--accent-blue), #5856D6); color: white;">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="bento-label text-white opacity-75">รายรับรวม (คอมฯ + เบี้ยเลี้ยง)</span>
+                <div class="bento-value text-white mt-1">฿ ${s.grandTotalJobsCost.toLocaleString()}</div>
+              </div>
+              <div class="bento-icon" style="background:rgba(255,255,255,0.2);"><i class="fa-solid fa-wallet"></i></div>
+            </div>
+          </div>
+          <!-- Card 2 -->
+          <div class="bento-card">
+            <div class="bento-icon" style="background:rgba(52,199,89,0.1); color:var(--accent-green);"><i class="fa-solid fa-road"></i></div>
+            <div class="bento-value">${s.totalDist.toLocaleString()}</div>
+            <span class="bento-label">ระยะทาง (กม.)</span>
+          </div>
+          <!-- Card 3 -->
+          <div class="bento-card">
+            <div class="bento-icon" style="background:rgba(255,59,48,0.1); color:var(--accent-red);"><i class="fa-solid fa-gas-pump"></i></div>
+            <div class="bento-value">฿ ${s.totalFuelCost.toLocaleString()}</div>
+            <span class="bento-label">ค่าน้ำมันรวม</span>
+          </div>
+          <!-- Card 4 -->
+          <div class="bento-card full-width">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="bento-label">อัตราสิ้นเปลือง</span>
+                <div class="bento-value mt-1" style="color:var(--accent-purple);">${s.fuelEfficiency} <span style="font-size:0.9rem;">กม./ลิตร</span></div>
+              </div>
+              <div class="bento-icon" style="background:rgba(175,82,222,0.1); color:var(--accent-purple);"><i class="fa-solid fa-gauge-high"></i></div>
+            </div>
+          </div>
+        </div>`;
+      });
+      container.innerHTML = html;
+      renderCharts(summaryList);
+    }
+
+    function renderCharts(summaryList) {
+      const labels = summaryList.map(s => s.period.split(' ')[1] || s.period);
+      const commData = summaryList.map(s => s.totalComm), allowData = summaryList.map(s => s.totalAllowance);
+      
+      if (incomeChartInstance) incomeChartInstance.destroy();
+      Chart.defaults.font.family = 'Prompt';
+      
+      const ctx = document.getElementById('incomeChart');
+      if(!ctx) return;
+      incomeChartInstance = new Chart(ctx.getContext('2d'), {
+        type: 'bar',
+        data: { labels: labels, datasets: [
+          { label: 'ค่าคอมฯ', data: commData, backgroundColor: '#007aff', borderRadius: 4 },
+          { label: 'เบี้ยเลี้ยง', data: allowData, backgroundColor: '#34c759', borderRadius: 4 }
+        ]},
+        options: { 
+          responsive: true, maintainAspectRatio: false, 
+          scales: { x: { stacked: true, grid: {display:false} }, y: { stacked: true, border:{display:false}, ticks:{font:{size:10}} } }, 
+          plugins: { legend: { position: 'top', labels:{boxWidth:10, font:{size:11}} } } 
         }
       });
     }
 
-    function renderCharts(summaryList) {
-      const labels = summaryList.map(s => s.period);
-      const commData = summaryList.map(s => s.totalComm), allowanceData = summaryList.map(s => s.totalAllowance), fuelData = summaryList.map(s => s.fuelEfficiency);
-      
-      if (incomeChartInstance) incomeChartInstance.destroy();
-      if (fuelChartInstance) fuelChartInstance.destroy();
-      Chart.defaults.font.family = 'Prompt';
+    function triggerChartResize() { setTimeout(() => { if(incomeChartInstance) incomeChartInstance.resize(); }, 300); }
 
-      incomeChartInstance = new Chart(document.getElementById('incomeChart').getContext('2d'), {
-        type: 'bar',
-        data: { labels: labels, datasets: [
-          { label: 'ค่าคอมฯ (฿)', data: commData, backgroundColor: '#4f46e5', borderRadius: 6 },
-          { label: 'เบี้ยเลี้ยง (฿)', data: allowanceData, backgroundColor: '#94a3b8', borderRadius: 6 }
-        ]},
-        options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: {display:false} }, y: { stacked: true, border:{display:false} } }, plugins: { legend: { position: 'bottom' } } }
-      });
-
-      fuelChartInstance = new Chart(document.getElementById('fuelChart').getContext('2d'), {
-        type: 'line',
-        data: { labels: labels, datasets: [{ label: 'กม./ลิตร', data: fuelData, borderColor: '#0d9488', backgroundColor: 'rgba(13, 148, 136, 0.1)', tension: 0.4, fill: true, borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor:'#0d9488', pointRadius: 5 }] },
-        options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: {display:false} }, y: { beginAtZero: true, border:{display:false} } }, plugins: { legend: { display: false } } }
-      });
-    }
-
-    function triggerChartResize() { setTimeout(() => { if(incomeChartInstance) incomeChartInstance.resize(); if(fuelChartInstance) fuelChartInstance.resize(); }, 300); }
-
-    function renderSummaryCards(summaryList) {
-      if(!summaryList.length) { document.getElementById('summaryCardsContainer').innerHTML = '<div class="text-center text-muted py-5">ไม่มีข้อมูลสรุปสำหรับรอบงวดนี้</div>'; return; }
-      let html = '';
-      summaryList.forEach(s => {
-        html += `
-        <div class="dashboard-card border-start border-5 border-primary mb-4">
-          <h5 class="fw-bold border-bottom pb-3 mb-4"><i class="fa-regular fa-calendar-check text-primary me-2"></i>งวดบัญชี: ${s.period}</h5>
-          <div class="row g-3">
-            <div class="col-12 col-md-4">
-              <div class="metric-card bg-indigo-premium">
-                <i class="fa-solid fa-wallet icon-bg"></i>
-                <div class="position-relative">
-                  <span class="small opacity-75 fw-bold">รายรับช่างรวม</span>
-                  <span class="card-value">${s.grandTotalJobsCost.toLocaleString()} ฿</span>
-                  <span class="d-block mt-3 small"><i class="fa-solid fa-check-circle me-1"></i>งานเสร็จ ${s.totalJobs} ใบ</span>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 col-md-4">
-              <div class="metric-card bg-teal-premium">
-                <i class="fa-solid fa-gas-pump icon-bg"></i>
-                <div class="position-relative">
-                  <span class="small opacity-75 fw-bold">ค่าน้ำมันรวม</span>
-                  <span class="card-value">${s.totalFuelCost.toLocaleString()} ฿</span>
-                  <span class="d-block mt-3 small"><i class="fa-solid fa-road me-1"></i>ระยะวิ่ง ${s.totalDist.toLocaleString()} กม.</span>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 col-md-4">
-              <div class="metric-card bg-rose-premium">
-                <i class="fa-solid fa-gauge-high icon-bg"></i>
-                <div class="position-relative">
-                  <span class="small opacity-75 fw-bold">อัตราสิ้นเปลือง</span>
-                  <span class="card-value">${s.fuelEfficiency} <small class="fs-6 fw-normal">กม./ลิตร</small></span>
-                  <span class="d-block mt-3 small"><i class="fa-solid fa-fill-drip me-1"></i>ใช้น้ำมัน ${s.totalFuelLiters.toLocaleString()} ลิตร</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="mt-4 pt-3 border-top text-center text-md-start">
-            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
-              รายได้: ค่าคอมฯ <span class="text-success fw-bold mx-1">${s.totalComm.toLocaleString()} ฿</span> | 
-              เบี้ยเลี้ยง <span class="text-primary fw-bold ms-1">${s.totalAllowance.toLocaleString()} ฿</span>
-            </span>
-          </div>
-        </div>`;
-      });
-      document.getElementById('summaryCardsContainer').innerHTML = html;
-    }
-
-    // ฟังก์ชันเปิดลงทะเบียน PWA Service Worker
     function registerPWA() {
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
-          .then(() => console.log('PWA Service Worker Registered Successfully.'))
-          .catch(err => console.error('Service Worker Registration Failed:', err));
+        navigator.serviceWorker.register('sw.js').catch(err => console.error(err));
       }
     }
   </script>
