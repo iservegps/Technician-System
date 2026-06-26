@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tech-dashboard-v4';
+const CACHE_NAME = 'tech-dashboard-v5';
 const ASSETS = [
   'index.html',
   'manifest.json',
