@@ -345,11 +345,98 @@
                 <div class="form-group mb-0"><label class="form-label">จังหวัดหน้างาน</label>
                   <select id="jobProvince" class="form-select" onchange="syncRegion(this, 'jobRegion')" required>
                     <option value="">-- เลือกจังหวัด --</option>
-                    <option value="ขอนแก่น" data-region="ภาคอีสาน">ขอนแก่น</option>
-                    <option value="อุดรธานี" data-region="ภาคอีสาน">อุดรธานี</option>
-                    <option value="นครราชสีมา" data-region="ภาคอีสาน">นครราชสีมา</option>
-                    <option value="บุรีรัมย์" data-region="ภาคอีสาน">บุรีรัมย์</option>
-                    <option value="ร้อยเอ็ด" data-region="ภาคอีสาน">ร้อยเอ็ด</option>
+                    <optgroup label="ภาคอีสาน">
+    <option value="กาฬสินธุ์" data-region="ภาคอีสาน">กาฬสินธุ์</option>
+    <option value="ขอนแก่น" data-region="ภาคอีสาน">ขอนแก่น</option>
+    <option value="ชัยภูมิ" data-region="ภาคอีสาน">ชัยภูมิ</option>
+    <option value="นครพนม" data-region="ภาคอีสาน">นครพนม</option>
+    <option value="นครราชสีมา" data-region="ภาคอีสาน">นครราชสีมา</option>
+    <option value="บึงกาฬ" data-region="ภาคอีสาน">บึงกาฬ</option>
+    <option value="บุรีรัมย์" data-region="ภาคอีสาน">บุรีรัมย์</option>
+    <option value="มหาสารคาม" data-region="ภาคอีสาน">มหาสารคาม</option>
+    <option value="มุกดาหาร" data-region="ภาคอีสาน">มุกดาหาร</option>
+    <option value="ยโสธร" data-region="ภาคอีสาน">ยโสธร</option>
+    <option value="ร้อยเอ็ด" data-region="ภาคอีสาน">ร้อยเอ็ด</option>
+    <option value="เลย" data-region="ภาคอีสาน">เลย</option>
+    <option value="สกลนคร" data-region="ภาคอีสาน">สกลนคร</option>
+    <option value="สุรินทร์" data-region="ภาคอีสาน">สุรินทร์</option>
+    <option value="ศรีสะเกษ" data-region="ภาคอีสาน">ศรีสะเกษ</option>
+    <option value="หนองคาย" data-region="ภาคอีสาน">หนองคาย</option>
+    <option value="หนองบัวลำภู" data-region="ภาคอีสาน">หนองบัวลำภู</option>
+    <option value="อำนาจเจริญ" data-region="ภาคอีสาน">อำนาจเจริญ</option>
+    <option value="อุดรธานี" data-region="ภาคอีสาน">อุดรธานี</option>
+    <option value="อุบลราชธานี" data-region="ภาคอีสาน">อุบลราชธานี</option>
+  </optgroup>
+<optgroup label="ภาคกลาง">
+    <option value="กรุงเทพมหานคร" data-region="ภาคกลาง">กรุงเทพมหานคร</option>
+    <option value="กำแพงเพชร" data-region="ภาคกลาง">กำแพงเพชร</option>
+    <option value="ชัยนาท" data-region="ภาคกลาง">ชัยนาท</option>
+    <option value="นครนายก" data-region="ภาคกลาง">นครนายก</option>
+    <option value="นครปฐม" data-region="ภาคกลาง">นครปฐม</option>
+    <option value="นครสวรรค์" data-region="ภาคกลาง">นครสวรรค์</option>
+    <option value="นนทบุรี" data-region="ภาคกลาง">นนทบุรี</option>
+    <option value="ปทุมธานี" data-region="ภาคกลาง">ปทุมธานี</option>
+    <option value="พระนครศรีอยุธยา" data-region="ภาคกลาง">พระนครศรีอยุธยา</option>
+    <option value="พิจิตร" data-region="ภาคกลาง">พิจิตร</option>
+    <option value="พิษณุโลก" data-region="ภาคกลาง">พิษณุโลก</option>
+    <option value="เพชรบูรณ์" data-region="ภาคกลาง">เพชรบูรณ์</option>
+    <option value="ลพบุรี" data-region="ภาคกลาง">ลพบุรี</option>
+    <option value="สมุทรปราการ" data-region="ภาคกลาง">สมุทรปราการ</option>
+    <option value="สมุทรสงคราม" data-region="ภาคกลาง">สมุทรสงคราม</option>
+    <option value="สมุทรสาคร" data-region="ภาคกลาง">สมุทรสาคร</option>
+    <option value="สระบุรี" data-region="ภาคกลาง">สระบุรี</option>
+    <option value="สิงห์บุรี" data-region="ภาคกลาง">สิงห์บุรี</option>
+    <option value="สุโขทัย" data-region="ภาคกลาง">สุโขทัย</option>
+    <option value="สุพรรณบุรี" data-region="ภาคกลาง">สุพรรณบุรี</option>
+    <option value="อ่างทอง" data-region="ภาคกลาง">อ่างทอง</option>
+    <option value="อุทัยธานี" data-region="ภาคกลาง">อุทัยธานี</option>
+  </optgroup>
+  <optgroup label="ภาคเหนือ">
+    <option value="เชียงใหม่" data-region="ภาคเหนือ">เชียงใหม่</option>
+    <option value="เชียงราย" data-region="ภาคเหนือ">เชียงราย</option>
+    <option value="ลำพูน" data-region="ภาคเหนือ">ลำพูน</option>
+    <option value="ลำปาง" data-region="ภาคเหนือ">ลำปาง</option>
+    <option value="แพร่" data-region="ภาคเหนือ">แพร่</option>
+    <option value="น่าน" data-region="ภาคเหนือ">น่าน</option>
+    <option value="พะเยา" data-region="ภาคเหนือ">พะเยา</option>
+    <option value="แม่ฮ่องสอน" data-region="ภาคเหนือ">แม่ฮ่องสอน</option>
+    <option value="อุตรดิตถ์" data-region="ภาคเหนือ">อุตรดิตถ์</option>
+  </optgroup>
+
+  <optgroup label="ภาคใต้">
+    <option value="กระบี่" data-region="ภาคใต้">กระบี่</option>
+    <option value="ชุมพร" data-region="ภาคใต้">ชุมพร</option>
+    <option value="ตรัง" data-region="ภาคใต้">ตรัง</option>
+    <option value="นครศรีธรรมราช" data-region="ภาคใต้">นครศรีธรรมราช</option>
+    <option value="นราธิวาส" data-region="ภาคใต้">นราธิวาส</option>
+    <option value="ปัตตานี" data-region="ภาคใต้">ปัตตานี</option>
+    <option value="พังงา" data-region="ภาคใต้">พังงา</option>
+    <option value="พัทลุง" data-region="ภาคใต้">พัทลุง</option>
+    <option value="ภูเก็ต" data-region="ภาคใต้">ภูเก็ต</option>
+    <option value="ยะลา" data-region="ภาคใต้">ยะลา</option>
+    <option value="ระนอง" data-region="ภาคใต้">ระนอง</option>
+    <option value="สงขลา" data-region="ภาคใต้">สงขลา</option>
+    <option value="สตูล" data-region="ภาคใต้">สตูล</option>
+    <option value="สุราษฎร์ธานี" data-region="ภาคใต้">สุราษฎร์ธานี</option>
+  </optgroup>
+
+  <optgroup label="ภาคตะวันออก">
+    <option value="จันทบุรี" data-region="ภาคตะวันออก">จันทบุรี</option>
+    <option value="ฉะเชิงเทรา" data-region="ภาคตะวันออก">ฉะเชิงเทรา</option>
+    <option value="ชลบุรี" data-region="ภาคตะวันออก">ชลบุรี</option>
+    <option value="ตราด" data-region="ภาคตะวันออก">ตราด</option>
+    <option value="ปราจีนบุรี" data-region="ภาคตะวันออก">ปราจีนบุรี</option>
+    <option value="ระยอง" data-region="ภาคตะวันออก">ระยอง</option>
+    <option value="สระแก้ว" data-region="ภาคตะวันออก">สระแก้ว</option>
+  </optgroup>
+
+  <optgroup label="ภาคตะวันตก">
+    <option value="กาญจนบุรี" data-region="ภาคตะวันตก">กาญจนบุรี</option>
+    <option value="ตาก" data-region="ภาคตะวันตก">ตาก</option>
+    <option value="ประจวบคีรีขันธ์" data-region="ภาคตะวันตก">ประจวบคีรีขันธ์</option>
+    <option value="เพชรบุรี" data-region="ภาคตะวันตก">เพชรบุรี</option>
+    <option value="ราชบุรี" data-region="ภาคตะวันตก">ราชบุรี</option>
+  </optgroup>
                   </select>
                 </div>
               </div>
