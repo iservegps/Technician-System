@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการงานช่างและการใช้รถ</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome สำหรับไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 สำหรับแจ้งเตือน -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap');
+        body { background-color: #f4f7f6; font-family: 'Sarabun', sans-serif; }
+        .card-summary { border-radius: 15px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.08); transition: transform 0.2s; }
+        .card-summary:hover { transform: translateY(-5px); }
+        .table-responsive { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .nav-pills .nav-link { border-radius: 50px; padding: 10px 25px; margin: 0 5px; color: #495057; font-weight: 500; }
+        .nav-pills .nav-link.active { background-color: #0d6efd; color: white; box-shadow: 0 4px 10px rgba(13,110,253,0.3); }
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9); z-index: 9999;
+            display: none; justify-content: center; align-items: center; flex-direction: column;
+        }
+        .table th { white-space: nowrap; }
+    </style>
+</head>
+<body>
+
+    <!-- หน้าจอโหลดดิ้ง -->
+    <div id="loadingOverlay">
+        <div class="spinner-border text-primary mb-3" role="status" style="width: 4rem; height: 4rem;"></div>
+        <h4 class="text-primary">กำลังประมวลผลข้อมูล...</h4>
+    </div>
+
+    <div class="container py-4">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold"><i class="fas fa-tools text-primary"></i> ระบบจัดการงานช่าง & การใช้รถ</h2>
+            <p class="text-muted">เชื่อมต่อข้อมูลกับ Google Sheets แบบ Real-time</p>
+        </div>
+
+        <!-- ตั้งค่า API URL -->
+        <div class="card mb-4 shadow-sm border-0" style="border-radius: 15px;">
+            <div class="card-body">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark text-white border-0"><i class="fas fa-link"></i> &nbsp;API URL</span>
+                    <input type="text" id="apiUrl" class="form-control" placeholder="วาง Web App URL จาก Google Apps Script (ลงท้ายด้วย /exec)">
+                    <button class="btn btn-primary px-4" onclick="saveConfigAndLoad()"><i class="fas fa-sync-alt"></i> โหลดข้อมูล</button>
+                    <button class="btn btn-outline-success px-4" onclick="initSheets()"><i class="fas fa-folder-plus"></i> สร้างแผ่นงาน</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- แท็บเมนู -->
+        <ul class="nav nav-pills mb-4 justify-content-center" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-summary" type="button"><i class="fas fa-chart-line"></i> แดชบอร์ดสรุป</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-jobs" type="button"><i class="fas fa-briefcase"></i> บันทึกงานช่าง</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-vehicles" type="button"><i class="fas fa-truck-pickup"></i> บันทึกการใช้รถ</button>
+            </li>
+        </ul>
+
+        <!-- เนื้อหาแท็บ -->
+        <div class="tab-content">
+            
+            <!-- 1. แดชบอร์ดสรุป -->
+            <div class="tab-pane fade show active" id="tab-summary">
+                <div id="summaryContainer" class="row g-4">
+                    <!-- ข้อมูลสรุปจะถูกแสดงที่นี่ผ่าน JavaScript -->
+                </div>
+            </div>
+
+            <!-- 2. ตารางงานช่าง -->
+            <div class="tab-pane fade" id="tab-jobs">
+                <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
+                    <h4 class="fw-bold text-primary m-0">รายการงานช่าง</h4>
+                    <button class="btn btn-primary" onclick="openJobModal()"><i class="fas fa-plus-circle"></i> เพิ่มงานใหม่</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle text-center" id="jobsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>วันที่</th>
+                                <th>ประเภทงาน</th>
+                                <th>ลูกค้า (User)</th>
+                                <th>ทะเบียนรถ</th>
+                                <th>พื้นที่ (จ./ภาค)</th>
+                                <th>ค่าคอมฯ</th>
+                                <th>เบี้ยเลี้ยง</th>
+                                <th>รอบบิล</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. ตารางการใช้รถ -->
+            <div class="tab-pane fade" id="tab-vehicles">
+                <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
+                    <h4 class="fw-bold text-warning m-0">รายการเบิกใช้รถ</h4>
+                    <button class="btn btn-warning text-dark" onclick="openVehicleModal()"><i class="fas fa-plus-circle"></i> เพิ่มการใช้รถ</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle text-center" id="vehiclesTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>วันที่</th>
+                                <th>เส้นทาง (ไป-กลับ)</th>
+                                <th>ลูกค้า/User</th>
+                                <th>ไมล์ (เริ่ม-จบ)</th>
+                                <th>ระยะทาง</th>
+                                <th>ข้อมูลน้ำมัน</th>
+                                <th>ค่าน้ำมัน</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal: งานช่าง -->
+    <div class="modal fade" id="jobModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white border-0">
+                    <h5 class="modal-title" id="jobModalTitle"><i class="fas fa-edit"></i> บันทึกงานช่าง</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="jobForm">
+                        <input type="hidden" id="jobId">
+                        <div class="mb-3">
+                            <label class="form-label text-muted">วันที่ปฏิบัติงาน</label>
+                            <input type="date" id="jobDate" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">ประเภทงาน</label>
+                            <select id="jobType" class="form-select" required>
+                                <option value="">-- เลือกประเภทงาน --</option>
+                                <option value="ติดตั้ง">ติดตั้ง (50฿)</option>
+                                <option value="ซ่อมบำรุง">ซ่อมบำรุง (50฿)</option>
+                                <option value="เปลี่ยนซิม">เปลี่ยนซิม (20฿)</option>
+                                <option value="อื่นๆ">อื่นๆ</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">User ลูกค้า</label>
+                            <input type="text" id="jobCustomerUser" class="form-control" placeholder="เช่น USR-1234" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">ทะเบียนรถ</label>
+                            <input type="text" id="jobCarLicense" class="form-control" placeholder="เช่น กข-9999">
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label text-muted">จังหวัด</label>
+                                <input type="text" id="jobProvince" class="form-control" required placeholder="เช่น ขอนแก่น">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label text-muted">ภาค</label>
+                                <input type="text" id="jobRegion" class="form-control" required placeholder="เช่น อีสาน">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary px-4" onclick="saveJob()">บันทึกข้อมูล</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: การใช้รถ -->
+    <div class="modal fade" id="vehicleModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning border-0">
+                    <h5 class="modal-title text-dark" id="vehicleModalTitle"><i class="fas fa-edit"></i> บันทึกการใช้รถ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="vehicleForm">
+                        <input type="hidden" id="vehicleId">
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">วันที่</label>
+                                <input type="date" id="vDate" class="form-control" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">ประเภทงาน</label>
+                                <input type="text" id="vJobType" class="form-control" placeholder="ติดตั้ง / ซ่อม / เซลล์">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">เลขใบเสร็จน้ำมัน</label>
+                                <input type="text" id="vReceipt" class="form-control" placeholder="ถ้าไม่มีให้เว้นว่าง">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">จุดเริ่มต้น</label>
+                                <input type="text" id="vStartLoc" class="form-control" required placeholder="เช่น ออฟฟิศ">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">ปลายทาง</label>
+                                <input type="text" id="vDestLoc" class="form-control" required placeholder="เช่น ไซต์งานลูกค้า">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">ชื่อลูกค้า</label>
+                                <input type="text" id="vCustName" class="form-control">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">User ลูกค้า</label>
+                                <input type="text" id="vCustUser" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">จังหวัด</label>
+                                <input type="text" id="vProvince" class="form-control">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">ภาค</label>
+                                <input type="text" id="vRegion" class="form-control">
+                            </div>
+                        </div>
+
+                        <hr class="text-muted">
+                        <h6 class="text-primary mb-3"><i class="fas fa-tachometer-alt"></i> ข้อมูลเลขไมล์ & น้ำมัน</h6>
+                        
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label text-muted">ไมล์ก่อนเดินทาง</label>
+                                <input type="number" id="vStartMile" class="form-control" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label text-muted">ไมล์หลังเดินทาง</label>
+                                <input type="number" id="vEndMile" class="form-control" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label text-muted">จำนวนลิตรที่เติม</label>
+                                <input type="number" step="0.01" id="vFuelLiters" class="form-control" value="0">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label text-muted">ราคา/ลิตร</label>
+                                <input type="number" step="0.01" id="vFuelPrice" class="form-control" value="0">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-warning px-4" onclick="saveVehicle()">บันทึกข้อมูล</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // กำหนดตัวแปรและดึง URL จาก LocalStorage
+        let scriptUrl = localStorage.getItem('gasApiUrl') || '';
+        document.getElementById('apiUrl').value = scriptUrl;
+        
+        let globalData = { jobs: [], vehicles: [], summary: [] };
+        const jobModal = new bootstrap.Modal(document.getElementById('jobModal'));
+        const vehicleModal = new bootstrap.Modal(document.getElementById('vehicleModal'));
+
+        // โหลดข้อมูลอัตโนมัติถ้าเคยตั้งค่า URL ไว้แล้ว
+        if(scriptUrl) fetchData();
+
+        function saveConfigAndLoad() {
+            const url = document.getElementById('apiUrl').value.trim();
+            if(!url) return Swal.fire('แจ้งเตือน', 'กรุณาระบุ API URL', 'warning');
+            localStorage.setItem('gasApiUrl', url);
+            scriptUrl = url;
+            fetchData();
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        }
+
+        // ==========================================
+        // ส่วนการเชื่อมต่อ API (ดึงและส่งข้อมูล)
+        // ==========================================
+
+        async function fetchData() {
+            showLoading(true);
+            try {
+                const response = await fetch(scriptUrl);
+                globalData = await response.json();
+                renderSummary(globalData.summary);
+                renderJobs(globalData.jobs);
+                renderVehicles(globalData.vehicles);
+            } catch (error) {
+                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถดึงข้อมูลได้ โปรดตรวจสอบ URL หรือสิทธิ์การเข้าถึง Web App', 'error');
+            }
+            showLoading(false);
+        }
+
+        async function postData(action, data = {}, id = null) {
+            if(!scriptUrl) return Swal.fire('แจ้งเตือน', 'กรุณาตั้งค่า API URL ก่อน', 'warning');
+            showLoading(true);
+            const payload = { action, data, id };
+            try {
+                const response = await fetch(scriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // ใช้ text/plain เลี่ยงปัญหา CORS ใน GAS
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if(result.success) {
+                    Swal.fire({ title: 'สำเร็จ!', text: result.message || 'บันทึกข้อมูลเรียบร้อย', icon: 'success', timer: 1500, showConfirmButton: false });
+                    fetchData(); // รีเฟรชข้อมูลใหม่
+                } else {
+                    Swal.fire('เกิดข้อผิดพลาด', result.message, 'error');
+                }
+            } catch (error) {
+                Swal.fire('ข้อผิดพลาดในการส่งข้อมูล', error.toString(), 'error');
+            }
+            showLoading(false);
+        }
+
+        function initSheets() {
+            postData('initSheets');
+        }
+
+        // ==========================================
+        // ส่วนการแสดงผล (Render UI)
+        // ==========================================
+
+        function renderSummary(summaryArr) {
+            const container = document.getElementById('summaryContainer');
+            container.innerHTML = '';
+            
+            if(!summaryArr || summaryArr.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center text-muted my-5"><h4>ยังไม่มีข้อมูลสรุป</h4><p>ลองเพิ่มงานช่าง หรือ ข้อมูลการใช้รถ เพื่อดูผลสรุป</p></div>';
+                return;
+            }
+
+            // เรียงลำดับจากรอบใหม่สุดไปเก่าสุด (อิงจากชื่อรอบแบบง่ายๆ)
+            summaryArr.sort((a, b) => b.period.localeCompare(a.period));
+
+            summaryArr.forEach(s => {
+                const card = `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card card-summary h-100">
+                        <div class="card-header bg-white border-bottom-0 pt-4 pb-0 text-center">
+                            <h5 class="text-primary fw-bold"><i class="fas fa-calendar-check"></i> ${s.period}</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-briefcase text-muted"></i> จำนวนงานรวม</span>
+                                    <span class="badge bg-primary rounded-pill fs-6">${s.totalJobs} งาน</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-road text-muted"></i> ระยะทางรวม</span>
+                                    <span class="fw-bold">${s.totalDist} กม.</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-gas-pump text-muted"></i> อัตราสิ้นเปลือง</span>
+                                    <span class="fw-bold">${s.fuelEfficiency} กม./ลิตร</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center bg-light mt-2 rounded">
+                                    <span class="text-success fw-bold">รายได้ (คอม+เบี้ยเลี้ยง)</span>
+                                    <span class="text-success fw-bold fs-5">฿${s.grandTotalJobsCost.toLocaleString()}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center rounded">
+                                    <span class="text-danger fw-bold">รายจ่าย (ค่าน้ำมัน)</span>
+                                    <span class="text-danger fw-bold fs-5">฿${s.totalFuelCost.toLocaleString()}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', card);
+            });
+        }
+
+        function renderJobs(jobsArr) {
+            const tbody = document.querySelector('#jobsTable tbody');
+            tbody.innerHTML = '';
+            jobsArr.forEach(j => {
+                let badgeClass = "bg-secondary";
+                if(j["ประเภทงาน"].includes("ติดตั้ง")) badgeClass = "bg-primary";
+                else if(j["ประเภทงาน"].includes("เปลี่ยนซิม")) badgeClass = "bg-info text-dark";
+
+                const tr = `
+                <tr>
+                    <td>${j["วันที่"]}</td>
+                    <td><span class="badge ${badgeClass}">${j["ประเภทงาน"]}</span></td>
+                    <td class="text-start">${j["Userลูกค้า"]}</td>
+                    <td>${j["ทะเบียนรถ"] || '-'}</td>
+                    <td>${j["จังหวัด"]} <br><small class="text-muted">(${j["ภาค"]})</small></td>
+                    <td class="text-success fw-bold">฿${j["ค่าคอมมิชชั่น"]}</td>
+                    <td class="text-primary fw-bold">฿${j["เบี้ยเลี้ยง"]}</td>
+                    <td><small class="badge bg-light text-dark border">${j["รอบเดือน"]}</small></td>
+                    <td>
+                        <button class="btn btn-sm btn-light text-primary border shadow-sm" onclick='editJob(${JSON.stringify(j)})'><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-light text-danger border shadow-sm" onclick="deleteRecord('deleteJob', '${j["ID"]}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+                tbody.insertAdjacentHTML('beforeend', tr);
+            });
+        }
+
+        function renderVehicles(vehArr) {
+            const tbody = document.querySelector('#vehiclesTable tbody');
+            tbody.innerHTML = '';
+            vehArr.forEach(v => {
+                const tr = `
+                <tr>
+                    <td>${v["วันที่"]}</td>
+                    <td class="text-start">${v["จุดเริ่มต้น"]} <i class="fas fa-long-arrow-alt-right text-muted mx-1"></i> ${v["ปลายทาง"]}</td>
+                    <td class="text-start">${v["ชื่อลูกค้า"] || '-'} <br><small class="text-muted">${v["Userลูกค้า"] || ''}</small></td>
+                    <td>${v["เลขไมล์เริ่ม"]} - ${v["เลขไมล์สิ้นสุด"]}</td>
+                    <td class="fw-bold text-primary">${v["ระยะทาง"]} กม.</td>
+                    <td>${v["ปริมาณน้ำมัน(ลิตร)"]} ลิตร <br><small class="text-muted">@ ฿${v["ราคาต่อลิตร"]}</small></td>
+                    <td class="text-danger fw-bold">฿${v["ค่าน้ำมัน"]}</td>
+                    <td>
+                        <button class="btn btn-sm btn-light text-warning border shadow-sm" onclick='editVehicle(${JSON.stringify(v)})'><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-light text-danger border shadow-sm" onclick="deleteRecord('deleteVehicle', '${v["ID"]}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+                tbody.insertAdjacentHTML('beforeend', tr);
+            });
+        }
+
+        // ==========================================
+        // ส่วนฟังก์ชันจัดการ งานช่าง (Jobs)
+        // ==========================================
+
+        function openJobModal() {
+            document.getElementById('jobForm').reset();
+            document.getElementById('jobId').value = '';
+            
+            // เซ็ตวันที่เป็นวันนี้อัตโนมัติ
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('jobDate').value = today;
+
+            document.getElementById('jobModalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> เพิ่มงานใหม่';
+            jobModal.show();
+        }
+
+        function editJob(job) {
+            document.getElementById('jobId').value = job["ID"];
+            document.getElementById('jobDate').value = job["วันที่"];
+            
+            // หาค่าที่ตรงกับใน Dropdown
+            let typeOptions = Array.from(document.getElementById('jobType').options).map(o => o.value);
+            document.getElementById('jobType').value = typeOptions.includes(job["ประเภทงาน"]) ? job["ประเภทงาน"] : "อื่นๆ";
+            
+            document.getElementById('jobCustomerUser').value = job["Userลูกค้า"];
+            document.getElementById('jobCarLicense').value = job["ทะเบียนรถ"];
+            document.getElementById('jobProvince').value = job["จังหวัด"];
+            document.getElementById('jobRegion').value = job["ภาค"];
+            document.getElementById('jobModalTitle').innerHTML = '<i class="fas fa-edit"></i> แก้ไขงาน';
+            jobModal.show();
+        }
+
+        function saveJob() {
+            const form = document.getElementById('jobForm');
+            if(!form.checkValidity()) return form.reportValidity();
+
+            const data = {
+                id: document.getElementById('jobId').value,
+                date: document.getElementById('jobDate').value,
+                jobType: document.getElementById('jobType').value,
+                customerUser: document.getElementById('jobCustomerUser').value,
+                carLicense: document.getElementById('jobCarLicense').value,
+                province: document.getElementById('jobProvince').value,
+                region: document.getElementById('jobRegion').value
+            };
+            
+            jobModal.hide();
+            postData('saveJob', data);
+        }
+
+        // ==========================================
+        // ส่วนฟังก์ชันจัดการ การใช้รถ (Vehicles)
+        // ==========================================
+
+        function openVehicleModal() {
+            document.getElementById('vehicleForm').reset();
+            document.getElementById('vehicleId').value = '';
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('vDate').value = today;
+
+            document.getElementById('vehicleModalTitle').innerHTML = '<i class="fas fa-plus-circle text-dark"></i> บันทึกการใช้รถ';
+            vehicleModal.show();
+        }
+
+        function editVehicle(v) {
+            document.getElementById('vehicleId').value = v["ID"];
+            document.getElementById('vDate').value = v["วันที่"];
+            document.getElementById('vJobType').value = v["ประเภทงาน"];
+            document.getElementById('vReceipt').value = v["เลขใบเสร็จ"];
+            document.getElementById('vStartLoc').value = v["จุดเริ่มต้น"];
+            document.getElementById('vDestLoc').value = v["ปลายทาง"];
+            document.getElementById('vCustName').value = v["ชื่อลูกค้า"];
+            document.getElementById('vCustUser').value = v["Userลูกค้า"];
+            document.getElementById('vProvince').value = v["จังหวัด"];
+            document.getElementById('vRegion').value = v["ภาค"];
+            document.getElementById('vStartMile').value = v["เลขไมล์เริ่ม"];
+            document.getElementById('vEndMile').value = v["เลขไมล์สิ้นสุด"];
+            document.getElementById('vFuelLiters').value = v["ปริมาณน้ำมัน(ลิตร)"];
+            document.getElementById('vFuelPrice').value = v["ราคาต่อลิตร"];
+            document.getElementById('vehicleModalTitle').innerHTML = '<i class="fas fa-edit text-dark"></i> แก้ไขการใช้รถ';
+            vehicleModal.show();
+        }
+
+        function saveVehicle() {
+            const form = document.getElementById('vehicleForm');
+            if(!form.checkValidity()) return form.reportValidity();
+
+            const data = {
+                id: document.getElementById('vehicleId').value,
+                date: document.getElementById('vDate').value,
+                jobType: document.getElementById('vJobType').value,
+                receiptNo: document.getElementById('vReceipt').value,
+                startLoc: document.getElementById('vStartLoc').value,
+                destLoc: document.getElementById('vDestLoc').value,
+                customerName: document.getElementById('vCustName').value,
+                customerUser: document.getElementById('vCustUser').value,
+                province: document.getElementById('vProvince').value,
+                region: document.getElementById('vRegion').value,
+                startMile: document.getElementById('vStartMile').value,
+                endMile: document.getElementById('vEndMile').value,
+                fuelLiters: document.getElementById('vFuelLiters').value,
+                fuelPrice: document.getElementById('vFuelPrice').value
+            };
+            
+            vehicleModal.hide();
+            postData('saveVehicle', data);
+        }
+
+        // ==========================================
+        // ฟังก์ชันลบข้อมูล
+        // ==========================================
+
+        function deleteRecord(action, id) {
+            Swal.fire({
+                title: 'ยืนยันการลบข้อมูล?',
+                text: "ข้อมูลนี้จะถูกลบออกจาก Google Sheets และไม่สามารถกู้คืนได้!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-trash"></i> ใช่, ลบเลย!',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    postData(action, {}, id);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
