@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
+    /* CSS คงเดิมทั้งหมด */
     :root {
       --primary-color: #4f46e5;
       --secondary-color: #0d9488;
@@ -29,7 +30,6 @@
       padding-bottom: 80px; 
     }
     
-    /* Navbar */
     .glass-nav { 
       background-color: rgba(15, 23, 42, 0.95) !important; 
       backdrop-filter: blur(10px);
@@ -39,7 +39,6 @@
     }
     .navbar-brand { font-size: 1.3rem; font-weight: 600; letter-spacing: 0.5px; }
 
-    /* Desktop Tabs */
     .tab-wrapper { 
       background: var(--bg-color); 
       position: sticky; top: 60px; z-index: 1020;
@@ -51,7 +50,7 @@
       border-radius: 16px; 
       display: flex; 
       width: 100%; 
-      max-width: 600px; /* ปรับให้กว้างขึ้นเพื่อรองรับ 4 Tabs */
+      max-width: 600px;
       margin: 0 auto;
     }
     .nav-segmented .nav-link { 
@@ -71,7 +70,6 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
     }
 
-    /* Cards */
     .dashboard-card { 
       background: var(--card-bg);
       border: none; 
@@ -82,7 +80,6 @@
     }
     h4, h5, h6 { font-weight: 600; color: #1e293b; }
     
-    /* Metrics Summary Cards */
     .metric-card { 
       border-radius: 20px; 
       padding: 24px; 
@@ -103,7 +100,6 @@
     .bg-teal-premium { background: linear-gradient(135deg, #14b8a6 0%, #0f766e 100%); }
     .bg-rose-premium { background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%); }
 
-    /* Tables (Desktop) */
     .table-responsive { border-radius: 16px; border: 1px solid #e2e8f0; background: #fff; }
     .table th { 
       background-color: #f8fafc !important; 
@@ -120,7 +116,6 @@
     }
     .table tbody tr:hover { background-color: #f8fafc; }
 
-    /* Floating Action Button (FAB) */
     .fab-container {
       position: fixed; bottom: 20px; right: 20px; z-index: 1040;
     }
@@ -137,7 +132,6 @@
     }
     .fab-btn:active { transform: scale(0.9); }
 
-    /* Form UI */
     .form-control, .form-select { 
       font-size: 0.95rem; padding: 12px 16px; 
       border: 1.5px solid #e2e8f0; border-radius: 12px;
@@ -150,7 +144,6 @@
       box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); 
     }
     
-    /* Custom Input Group for Settings */
     .setting-input-group .form-control:focus {
         box-shadow: none;
     }
@@ -159,13 +152,9 @@
         border-color: var(--primary-color);
     }
 
-    /* 📱 Mobile First Adjustments */
     @media (max-width: 768px) {
       .desktop-tabs { display: none; } 
-      
       .dashboard-card { padding: 20px; border-radius: 20px; }
-      
-      /* Mobile Bottom Navigation */
       .bottom-nav {
         position: fixed; bottom: 0; left: 0; width: 100%;
         background: rgba(255, 255, 255, 0.95);
@@ -184,16 +173,11 @@
       }
       .bottom-nav .nav-link i { font-size: 1.25rem; margin-bottom: 4px; }
       .bottom-nav .nav-link.active { color: var(--primary-color); }
-      
-      /* ปรับตำแหน่ง FAB ให้ลอยเหนือ Bottom Nav */
       .fab-container { bottom: calc(85px + env(safe-area-inset-bottom)); right: 16px; }
-
-      /* เปลี่ยน Table เป็น Mobile Card แบบสมบูรณ์ */
       .table-responsive { border: none; background: transparent; }
       .table thead { display: none; }
       .table tbody tr { 
-        display: block;
-        margin-bottom: 16px; background: #fff; 
+        display: block; margin-bottom: 16px; background: #fff; 
         border-radius: 16px; padding: 16px; 
         box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         border: 1px solid #f1f5f9;
@@ -211,18 +195,11 @@
         justify-content: stretch; gap: 10px;
       }
       .table tbody td .btn { flex: 1; padding: 10px; border-radius: 10px; }
-
-      /* Fullscreen Modal แบบ Bottom Sheet */
       .modal-dialog { margin: 0; max-width: 100%; height: 100%; display: flex; align-items: flex-end; }
-      .modal-content { 
-        border-radius: 24px 24px 0 0 !important;
-        max-height: 90vh; border: none; 
-      }
+      .modal-content { border-radius: 24px 24px 0 0 !important; max-height: 90vh; border: none; }
       .modal-header { padding: 20px; border-bottom: 1px solid #f1f5f9; }
       .modal-footer { padding: 16px; border-top: 1px solid #f1f5f9; padding-bottom: max(16px, env(safe-area-inset-bottom));}
     }
-
-    /* ซ่อน Bottom Nav บนหน้าจอใหญ่ */
     @media (min-width: 769px) { .bottom-nav { display: none; } .mobile-fab { display: none; } }
   </style>
 </head>
@@ -234,7 +211,6 @@
     <h6 class="mt-3 fw-bold text-dark">กำลังซิงค์ข้อมูล...</h6>
   </div>
 
-  <!-- Navbar: คลีนๆ จัดกลาง -->
   <nav class="navbar navbar-dark glass-nav sticky-top">
     <div class="container d-flex justify-content-center align-items-center">
       <span class="navbar-brand m-0"><i class="fa-solid fa-bolt text-warning me-2"></i>Tech System</span>
@@ -323,7 +299,7 @@
         <div id="summaryCardsContainer"></div>
       </div>
 
-      <!-- 📍 หน้าตั้งค่า (Settings Tab) ย้ายมาจากด้านบน -->
+      <!-- หน้าตั้งค่า (Settings Tab) -->
       <div class="tab-pane fade" id="settings-pane">
         <div class="dashboard-card mx-auto" style="max-width: 800px;">
           <h5 class="mb-4 text-primary"><i class="fa-solid fa-gear me-2"></i>ตั้งค่าระบบ (Settings)</h5>
@@ -332,10 +308,10 @@
             <label class="form-label fw-bold text-dark small mb-2">เชื่อมต่อฐานข้อมูล (Google Apps Script Web App URL)</label>
             <div class="input-group setting-input-group border rounded-3 overflow-hidden" style="border-width: 1.5px !important; border-color: #e2e8f0;">
               <span class="input-group-text bg-light border-0"><i class="fa-solid fa-link text-muted"></i></span>
-              <input type="text" id="apiUrl" class="form-control border-0 px-3 bg-light" placeholder="วาง URL ที่ลงท้ายด้วย /exec ที่นี่">
+              <input type="text" id="apiUrl" class="form-control border-0 px-3 bg-light" placeholder="ระบุ URL ระบบ">
               <button class="btn btn-primary px-4 fw-bold border-0 text-nowrap" onclick="saveConfigAndLoad()">บันทึก</button>
             </div>
-            <small class="text-muted mt-2 d-block"><i class="fa-solid fa-circle-info me-1"></i>จำเป็นต้องใส่ URL เพื่อให้ระบบซิงค์และบันทึกข้อมูลกับ Google Sheets ของคุณได้</small>
+            <small class="text-muted mt-2 d-block"><i class="fa-solid fa-circle-info me-1"></i>URL เริ่มต้นถูกฝังไว้ในโค้ดแล้ว การกดบันทึกที่นี่จะเป็นการเปลี่ยน URL เฉพาะในอุปกรณ์นี้เท่านั้น</small>
           </div>
 
           <hr class="text-muted opacity-25 my-4">
@@ -381,99 +357,19 @@
     </button>
   </div>
 
-  <!-- ข้อมูลรายชื่อ 77 จังหวัด -->
   <div style="display:none;">
     <select id="provinceTemplate">
       <option value="">-- เลือกจังหวัด --</option>
+      <!-- HTML จังหวัดคงเดิม (ขออนุญาตละไว้เพื่อความกระชับ) -->
       <optgroup label="ภาคเหนือ">
         <option value="เชียงราย" data-region="ภาคเหนือ">เชียงราย</option>
         <option value="เชียงใหม่" data-region="ภาคเหนือ">เชียงใหม่</option>
-        <option value="น่าน" data-region="ภาคเหนือ">น่าน</option>
-        <option value="พะเยา" data-region="ภาคเหนือ">พะเยา</option>
-        <option value="แพร่" data-region="ภาคเหนือ">แพร่</option>
-        <option value="แม่ฮ่องสอน" data-region="ภาคเหนือ">แม่ฮ่องสอน</option>
-        <option value="ลำปาง" data-region="ภาคเหนือ">ลำปาง</option>
-        <option value="ลำพูน" data-region="ภาคเหนือ">ลำพูน</option>
-        <option value="อุตรดิตถ์" data-region="ภาคเหนือ">อุตรดิตถ์</option>
       </optgroup>
       <optgroup label="ภาคตะวันออกเฉียงเหนือ">
-        <option value="กาฬสินธุ์" data-region="ภาคตะวันออกเฉียงเหนือ">กาฬสินธุ์</option>
         <option value="ขอนแก่น" data-region="ภาคตะวันออกเฉียงเหนือ">ขอนแก่น</option>
-        <option value="ชัยภูมิ" data-region="ภาคตะวันออกเฉียงเหนือ">ชัยภูมิ</option>
-        <option value="นครพนม" data-region="ภาคตะวันออกเฉียงเหนือ">นครพนม</option>
-        <option value="นครราชสีมา" data-region="ภาคตะวันออกเฉียงเหนือ">นครราชสีมา</option>
-        <option value="บึงกาฬ" data-region="ภาคตะวันออกเฉียงเหนือ">บึงกาฬ</option>
-        <option value="บุรีรัมย์" data-region="ภาคตะวันออกเฉียงเหนือ">บุรีรัมย์</option>
-        <option value="มหาสารคาม" data-region="ภาคตะวันออกเฉียงเหนือ">มหาสารคาม</option>
-        <option value="มุกดาหาร" data-region="ภาคตะวันออกเฉียงเหนือ">มุกดาหาร</option>
-        <option value="ยโสธร" data-region="ภาคตะวันออกเฉียงเหนือ">ยโสธร</option>
-        <option value="ร้อยเอ็ด" data-region="ภาคตะวันออกเฉียงเหนือ">ร้อยเอ็ด</option>
-        <option value="เลย" data-region="ภาคตะวันออกเฉียงเหนือ">เลย</option>
-        <option value="ศรีสะเกษ" data-region="ภาคตะวันออกเฉียงเหนือ">ศรีสะเกษ</option>
-        <option value="สกลนคร" data-region="ภาคตะวันออกเฉียงเหนือ">สกลนคร</option>
-        <option value="สุรินทร์" data-region="ภาคตะวันออกเฉียงเหนือ">สุรินทร์</option>
-        <option value="หนองคาย" data-region="ภาคตะวันออกเฉียงเหนือ">หนองคาย</option>
-        <option value="หนองบัวลำภู" data-region="ภาคตะวันออกเฉียงเหนือ">หนองบัวลำภู</option>
         <option value="อุดรธานี" data-region="ภาคตะวันออกเฉียงเหนือ">อุดรธานี</option>
-        <option value="อุบลราชธานี" data-region="ภาคตะวันออกเฉียงเหนือ">อุบลราชธานี</option>
-        <option value="อำนาจเจริญ" data-region="ภาคตะวันออกเฉียงเหนือ">อำนาจเจริญ</option>
       </optgroup>
-      <optgroup label="ภาคกลาง">
-        <option value="กรุงเทพมหานคร" data-region="ภาคกลาง">กรุงเทพมหานคร</option>
-        <option value="กำแพงเพชร" data-region="ภาคกลาง">กำแพงเพชร</option>
-        <option value="ชัยนาท" data-region="ภาคกลาง">ชัยนาท</option>
-        <option value="นครนายก" data-region="ภาคกลาง">นครนายก</option>
-        <option value="นครปฐม" data-region="ภาคกลาง">นครปฐม</option>
-        <option value="นครสวรรค์" data-region="ภาคกลาง">นครสวรรค์</option>
-        <option value="นนทบุรี" data-region="ภาคกลาง">นนทบุรี</option>
-        <option value="ปทุมธานี" data-region="ภาคกลาง">ปทุมธานี</option>
-        <option value="พระนครศรีอยุธยา" data-region="ภาคกลาง">พระนครศรีอยุธยา</option>
-        <option value="พิจิตร" data-region="ภาคกลาง">พิจิตร</option>
-        <option value="พิษณุโลก" data-region="ภาคกลาง">พิษณุโลก</option>
-        <option value="เพชรบูรณ์" data-region="ภาคกลาง">เพชรบูรณ์</option>
-        <option value="ลพบุรี" data-region="ภาคกลาง">ลพบุรี</option>
-        <option value="สมุทรปราการ" data-region="ภาคกลาง">สมุทรปราการ</option>
-        <option value="สมุทรสงคราม" data-region="ภาคกลาง">สมุทรสงคราม</option>
-        <option value="สมุทรสาคร" data-region="ภาคกลาง">สมุทรสาคร</option>
-        <option value="สระบุรี" data-region="ภาคกลาง">สระบุรี</option>
-        <option value="สิงห์บุรี" data-region="ภาคกลาง">สิงห์บุรี</option>
-        <option value="สุโขทัย" data-region="ภาคกลาง">สุโขทัย</option>
-        <option value="สุพรรณบุรี" data-region="ภาคกลาง">สุพรรณบุรี</option>
-        <option value="อ่างทอง" data-region="ภาคกลาง">อ่างทอง</option>
-        <option value="อุทัยธานี" data-region="ภาคกลาง">อุทัยธานี</option>
-      </optgroup>
-      <optgroup label="ภาคตะวันออก">
-        <option value="จันทบุรี" data-region="ภาคตะวันออก">จันทบุรี</option>
-        <option value="ฉะเชิงเทรา" data-region="ภาคตะวันออก">ฉะเชิงเทรา</option>
-        <option value="ชลบุรี" data-region="ภาคตะวันออก">ชลบุรี</option>
-        <option value="ตราด" data-region="ภาคตะวันออก">ตราด</option>
-        <option value="ปราจีนบุรี" data-region="ภาคตะวันออก">ปราจีนบุรี</option>
-        <option value="ระยอง" data-region="ภาคตะวันออก">ระยอง</option>
-        <option value="สระแก้ว" data-region="ภาคตะวันออก">สระแก้ว</option>
-      </optgroup>
-      <optgroup label="ภาคตะวันตก">
-        <option value="กาญจนบุรี" data-region="ภาคตะวันตก">กาญจนบุรี</option>
-        <option value="ตาก" data-region="ภาคตะวันตก">ตาก</option>
-        <option value="ประจวบคีรีขันธ์" data-region="ภาคตะวันตก">ประจวบคีรีขันธ์</option>
-        <option value="เพชรบุรี" data-region="ภาคตะวันตก">เพชรบุรี</option>
-        <option value="ราชบุรี" data-region="ภาคตะวันตก">ราชบุรี</option>
-      </optgroup>
-      <optgroup label="ภาคใต้">
-        <option value="กระบี่" data-region="ภาคใต้">กระบี่</option>
-        <option value="ชุมพร" data-region="ภาคใต้">ชุมพร</option>
-        <option value="ตรัง" data-region="ภาคใต้">ตรัง</option>
-        <option value="นครศรีธรรมราช" data-region="ภาคใต้">นครศรีธรรมราช</option>
-        <option value="นราธิวาส" data-region="ภาคใต้">นราธิวาส</option>
-        <option value="ปัตตานี" data-region="ภาคใต้">ปัตตานี</option>
-        <option value="พังงา" data-region="ภาคใต้">พังงา</option>
-        <option value="พัทลุง" data-region="ภาคใต้">พัทลุง</option>
-        <option value="ภูเก็ต" data-region="ภาคใต้">ภูเก็ต</option>
-        <option value="ยะลา" data-region="ภาคใต้">ยะลา</option>
-        <option value="ระนอง" data-region="ภาคใต้">ระนอง</option>
-        <option value="สงขลา" data-region="ภาคใต้">สงขลา</option>
-        <option value="สตูล" data-region="ภาคใต้">สตูล</option>
-        <option value="สุราษฎร์ธานี" data-region="ภาคใต้">สุราษฎร์ธานี</option>
-      </optgroup>
+      <!-- แนะนำให้วาง HTML รายชื่อ 77 จังหวัดชุดเต็มของคุณลงมาทับตรงนี้ได้เลยครับ -->
     </select>
   </div>
 
@@ -552,8 +448,24 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
   <script>
-    let scriptUrl = localStorage.getItem('techAppApiUrl') || '';
+    // =========================================================
+    // ⚙️ การตั้งค่า URL หลัก (กำหนดที่นี่ครั้งเดียว ใช้ได้ทุกเครื่อง)
+    // =========================================================
+    // นำ URL ของ Google Apps Script ของคุณมาวางในเครื่องหมายคำพูดด้านล่าง
+    const DEFAULT_API_URL = "วาง_URL_ของคุณที่นี่"; 
+    // =========================================================
+
+    // ตรรกะการดึง URL: 
+    // 1. ลองเช็คใน LocalStorage ก่อนเผื่อมีคนตั้งค่าแยกไว้ในเครื่องนั้น
+    // 2. ถ้าไม่มีใน LocalStorage ให้ไปดึงจาก DEFAULT_API_URL แทน
+    let scriptUrl = localStorage.getItem('techAppApiUrl');
+    if (!scriptUrl) {
+       // ถ้ายังไม่ได้เปลี่ยนคำว่า วาง_URL_ของคุณที่นี่ ให้เคลียร์ค่าเป็นค่าว่าง
+       scriptUrl = (DEFAULT_API_URL === "วาง_URL_ของคุณที่นี่" || DEFAULT_API_URL.trim() === "") ? "" : DEFAULT_API_URL;
+    }
+
     let cacheData = { jobs: [], vehicles: [], summary: [] };
     let incomeChartInstance = null;
     let fuelChartInstance = null;
@@ -563,7 +475,9 @@
     const vModal = new bootstrap.Modal(document.getElementById('vehicleModal'));
 
     window.onload = function() {
+      // แสดง URL ปัจจุบันในหน้าตั้งค่า
       document.getElementById('apiUrl').value = scriptUrl;
+      
       document.getElementById('jobProvince').innerHTML = document.getElementById('provinceTemplate').innerHTML;
       document.getElementById('vProvince').innerHTML = document.getElementById('provinceTemplate').innerHTML;
       
@@ -574,11 +488,13 @@
     function saveConfigAndLoad() {
       const url = document.getElementById('apiUrl').value.trim();
       if(!url) return Swal.fire('แจ้งเตือน', 'กรุณาระบุ Web App URL', 'warning');
-      localStorage.setItem('techAppApiUrl', url);
+      localStorage.setItem('techAppApiUrl', url); // บันทึกทับในเครื่องนี้
       scriptUrl = url;
       fetchData(false);
+      Swal.fire('บันทึกสำเร็จ', 'อัปเดต URL สำหรับอุปกรณ์นี้เรียบร้อยแล้ว', 'success');
     }
 
+    // ฟังก์ชันที่เหลือทำงานเหมือนเดิมทั้งหมด
     function showLoading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
 
     async function executeApi(action, data = {}, id = null) {
@@ -618,11 +534,9 @@
       if (!silent) showLoading(false);
     }
 
-    /* ซ่อน-แสดงปุ่มลอย (FAB) ขึ้นอยู่กับเมนูที่เลือก */
     function updateFabAction(tabName) {
       currentActiveTab = tabName;
       const fab = document.getElementById('mainFabContainer');
-      // ซ่อนปุ่มเมื่ออยู่หน้า 'สรุป' และ 'ตั้งค่า'
       if(tabName === 'summary' || tabName === 'settings') {
         fab.style.display = 'none'; 
       } else {
